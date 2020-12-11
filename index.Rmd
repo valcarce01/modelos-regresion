@@ -1,0 +1,231 @@
+---
+title: "ACP sobre la hoja del tabaco"
+author: "Diego(s) Prieto y Valcarce"
+date: 2020
+output: 
+  pdf_document:
+    fig_width: 10 
+    fig_height: 5
+---
+```{r include = FALSE}
+load('tabaco.RData')
+attach(tabaco) # para no tener que llamar todo el rato a la base de datos
+# Librerías que usaremos:
+library(corrplot)
+library(GGally)
+```
+
+\renewcommand*\contentsname{Índice}
+\tableofcontents
+\newpage
+
+\section{Análisis descriptivo}
+Antes de empezar a analizar las componentes principales, realizamos un 
+análisis exploratorio; por lo que primero empezamos observando que contiene
+la base de datos proporcionada.
+```{r}
+str(tabaco)
+```
+Podemos observar que no hay ninguna variable cualitativa y que tenemos 
+una base de datos de 8 variables y 25 observaciones. Procederemos 
+ahora a realizar un pequeño resumen de los datos:
+```{r}
+summary(tabaco)
+```
+\subsection{Análisis univariante}
+Vamos a analizar variable a variable para conocerlas un poco más. Como 
+todas las variables son cuantitativas continuas realizaremos tanto histogramas
+como diagramas de cajas sobre la muestra:
+```{r fig.width = 10, fig.height = 5, fig.align = 'center'}
+par(mfrow=c(2,4))
+hist(nitrogeno, main = 'Nitrógeno')
+hist(potasio, main = 'Potasio', breaks = 5)
+hist(fosforo, main = 'Fósforo')
+hist(calcio, main = 'Calcio')
+hist(magnesio, main = 'Magnesio')
+hist(carbono, main = 'Carbono')
+hist(azucar, main = 'Azúcar')
+hist(nicotina, main = 'Nicotina')
+```
+Nótese que hemos cambiado el número de intervalos con el que se genera el
+histograma del potasio, puesto que los calculados por R no eran 
+representativos: generaba 9 columnas, recordemos que tenemos solamente
+25 entradas, y dejaba la media de los datos sin ninguna frecuencia.
+
+Ahora vamos a hacer los diagramas de cajas:
+```{r fig.width = 10, fig.height = 4.5, fig.align = 'center'}
+par(mfrow=c(2,4))
+boxplot(nitrogeno, main = 'Nitrógeno')
+boxplot(potasio, main = 'Potasio')
+boxplot(fosforo, main = 'Fósforo')
+boxplot(calcio, main = 'Calcio')
+boxplot(magnesio, main = 'Magnesio')
+boxplot(carbono, main = 'Carbono')
+boxplot(azucar, main = 'Azúcar')
+boxplot(nicotina, main = 'Nicotina')
+```
+Se puede observar que tenemos datos 'atípicos' en las variables fósforo,
+calcio, magnesio, carbono y azúcar.
+
+\subsection{Análisis multivariante}
+Mostraremos a continuación los gráficos de dispersión para cada par de 
+variables, pero como tenemos 8, no aporta una gran información visual,
+por lo que posteriormente analizaremos más en profundidad las correlaciones.
+```{r}
+pairs(tabaco)
+```
+```{r fig.width = 3, fig.height = 3.5, fig.align = 'center'}
+corrplot(round(cor(tabaco), digits = 3), type = "lower")
+```
+
+Como se puede observar en la gráfica, donde los colores oscuros representan 
+correlaciones altas entre cada par de variables, como por ejemplo vemos
+correlaciones negativas fuertes entre potasio y fósforo y calcio y correlaciones
+positivas fuertes entre fósforo con calcio, azúcar y nicotina y el azúcar con la nicotina.
+
+Hay otras variables, que están correlacionadas, pero en menor medida, pero
+que en conjunto son suficientes como para pensar que se puede realizar un
+análisis de componentes principales (ACP).
+
+\section{Análisis de componentes principales}
+Empezamos haciendo las componentes principales:
+```{r}
+( tabaco.acp <- princomp(tabaco) )
+```
+\subsection{Número de componentes principales}
+```{r}
+summary(tabaco.acp)
+```
+
+Podemos observar que con 2 componentes principales, podemos explicar 
+el 93.9\% de la variabilidad de los datos. Es cierto que cogiendo la 
+tercera componente principal pasaríamos a explicar el 97\%, pero no compensa
+porque supone más costo computacional y sería más difícil de interpretar
+gráficamente.
+
+\subsection{Correlaciones entre CP y variables originales}
+```{r fig.width = 10, fig.height = 4, fig.align = 'center'}
+loadings(tabaco.acp)
+barplot(loadings(tabaco.acp),beside=TRUE)
+```
+Se puede observar tanto gráfica como numéricamente que en la componente 1
+el potasio tiene un peso muy superior al resto de las variables, mientras
+que en la componente principal 2, sucede lo mismo pero el peso lo tiene 
+el magnesio.
+\subsection{Expresión de las componentes principales}
+$$ \vec{z} = \vec{x} \cdot carga factorial$$
+$z_1 = -0.965\cdot x_2 + 0.181 \cdot x_3 - 0.128 \cdot x_5$
+ 
+$z_2 = 0.156\cdot x_1 - 0.225\cdot x_3 - 0.155\cdot x_4 -0.826\cdot x_5 + 0.172\cdot x_6 - 0.417\cdot x_7 - 0.122 \cdot x_8$
+ 
+$z_3 = 0.254\cdot x_2 + 0.707\cdot x_3 + 0.135\cdot x_4 -0.46\cdot x_5 - 0.183\cdot x_6 + 0.399 \cdot x_7 + 0.103 \cdot x_8$
+ 
+$z_4 = 0.245\cdot x_1 + 0.367\cdot x_3 + 0.405 \cdot x_4 + 0.179\cdot x_5 + 0.718\cdot x_6 - 0.293\cdot x_7$
+ 
+$z_5 = 0.298\cdot x_1 - 0.483\cdot x_3 + 0.319\cdot x_4 - 0.142\cdot x_5 + 0.265\cdot x_6 + 0.684\cdot x_7 - 0.132\cdot x_8$
+ 
+$z_6 = 0.595\cdot x_1 + 0.185\cdot x_3 - 0.703\cdot x_4 + 0.171\cdot x_5 + 0.154 \cdot x_7 - 0.231\cdot x_8$
+ 
+$z_7 = 0.626\cdot x_1 + 0.423 \cdot x_4 - 0.574\cdot x_6 - 0.284\cdot x_7$
+ 
+ $z_8 = 0.277\cdot x_1 - 0.111\cdot x_3 + 0.107\cdot x_6 + 0.943\cdot x_8$
+ 
+ Siendo 
+ $$
+ \begin{matrix}
+ x_1 &\rightarrow& \mbox{ nitrógeno} \\
+ x_2 &\rightarrow&\mbox{ potasio} \\
+ x_3 &\rightarrow&\mbox{ fósforo} \\
+ x_4 &\rightarrow&\mbox{ calcio} \\
+ x_5 &\rightarrow&\mbox{ magnesio} \\
+ x_6 &\rightarrow&\mbox{ carbono} \\
+ x_7 &\rightarrow&\mbox{ azúcar} \\
+ x_8 &\rightarrow&\mbox{ nicotina}
+ \end{matrix}
+ $$
+ 
+\subsection{Porcentaje de variabilidad}
+```{r}
+summary(tabaco.acp)
+```
+La componente principal 1 explica el 86.68\% de la variabilidad total y la
+componente principal 2 el 7.07\%.
+\subsection{Variables explicadas}
+```{r}
+loadings(tabaco.acp)
+```
+Como se pudo observar la CP1 solo explica 3 variables, siendo una de ellas (potasio)
+claramente superior en peso (-0.9) y en la CP2 justamente explica todas las variables
+excepto el potasio, y le da un peso muy alto al magnesio (-0.8) seguido del azúcar (-0.4). El resto
+de las variables en esta segunda componente rondarían los -0.1.
+\subsection{Importancia relativa de las CP}
+```{r fig.width = 10, fig.height = 3.5, fig.align = 'center'}
+par(mfrow=c(1,2))
+screeplot(tabaco.acp, main = "CP")
+screeplot(tabaco.acp, type = "lines", main = "CP")
+```
+Claramente se observa que a partir de la segunda componente principal la variabilidad
+explicada no crece tanto como para que sea significativa y por tanto, tenerlas en cuenta.
+\subsection{Varianzas de las componentes obtenidas}
+```{r}
+tabaco.acp$sdev^2
+```
+\subsection{Matriz de puntutaciones y representación}
+```{r}
+# Las puntuaciones (mostramos las primeras que son demasiadas)
+knitr::kable(tabaco.acp$scores[1:5,], digits = 3, format = "latex")
+plot(tabaco.acp$scores[,1],tabaco.acp$scores[,2], 
+     xlab="Componente 1", ylab="Componente 2", pch=16)
+```
+
+\subsection{Biplot}
+```{r}
+biplot(tabaco.acp)
+```
+Lo que se describió anteriormente sobre que la componente principal 1 daba un 
+gran peso al potasio puede confirmarse gráficamente ahora ya que es la única
+que aparentemente no está en el centro de coordenadas. En cuanto a la componente
+principal 2, gráficamente no puede afirmarse nada.
+
+\subsection{Rotación Varimax}
+En otros casos puede resultar conveniente realizar una rotación Varimax, pero
+en este caso, donde las componentes originales escogidas, ya destacaban por
+tener pocas variables con mucho peso (y además, la CP1 con muchos nulos), no aporta
+información nueva realizar la rotación. De todas maneras, se realizaría de 
+la siguiente forma:
+```{r}
+varimax(loadings(tabaco.acp))$loadings
+```
+\subsection{Cargas factoriales en subgrupos}
+```{r}
+tabaco.baja <- tabaco[tabaco$nicotina<1, 1:7]
+tabaco.alta <- tabaco[tabaco$nicotina>=1, 1:7]
+# ACP:
+# Nicotina baja:
+( test.acp.b <- princomp(tabaco.baja) )
+summary(test.acp.b)
+loadings(test.acp.b)
+```
+```{r fig.width = 5, fig.height = 3.5, fig.align = 'center'}
+barplot(loadings(test.acp.b),beside=TRUE)
+
+# Nicotina alta
+( test.acp.a <- princomp(tabaco.alta) )
+summary(test.acp.a)
+loadings(test.acp.a)
+```
+```{r fig.width = 5, fig.height = 3.5, fig.align = 'center'}
+barplot(loadings(test.acp.a),beside=TRUE)
+```
+Lo que vienen siendo los valores numéricos, como era de suponer, se ven modificados,
+pero la idea de que hay 2 variables (una por componente) con un peso muy superior
+a las demás se mantiene, por lo que realmente no podemos decir que haya diferencia
+entre analizar los subgrupos y analizar el grupo completo. No obstante, si 
+que existe una diferencia pequeña entre ambos subgrupos y es la importancia que toma
+el fósforo en las componentes 1 y 2; siendo la primera relativamente pequeña 
+y negativa (-0.2), pero siendo positiva y bastante superior en la segunda (0.4).
+
+```{r include = FALSE}
+ggpairs(tabaco, lower = list(continuous = "smooth"), 
+        diag = list(continuous = "bar"), axisLabels = "none")
+```
