@@ -1,0 +1,12 @@
+---
+title: "Regresión lineal simple"
+output: 
+  html_notebook: 
+    code_folding: hide
+    fig_caption: yes
+    highlight: tango
+    prettydoc::html_pretty:
+      theme: leonids
+    toc: yes
+---
+## Prueba
