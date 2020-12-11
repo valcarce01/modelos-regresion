@@ -3,7 +3,7 @@ title: "ACP sobre la hoja del tabaco"
 author: "Diego(s) Prieto y Valcarce"
 date: 2020
 output: 
-  pdf_document:
+  html_notebook:
     fig_width: 10 
     fig_height: 5
 ---
