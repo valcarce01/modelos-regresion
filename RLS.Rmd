@@ -1,12 +1,46 @@
 ---
-title: "Regresión lineal simple"
+title: "Modelos de regresión"
 output: 
-  html_notebook: 
-    code_folding: hide
+  prettydoc::html_pretty:
+    theme: leonids
     fig_caption: yes
     highlight: tango
-    prettydoc::html_pretty:
-      theme: leonids
     toc: yes
 ---
-## Prueba
+Renuncia de responsibilidad.
+
+# Regresión lineal simple
+Objetivo: construir un modelo tal que $Y_i = \beta_0 + \beta_1\cdot X_i + \epsilon_i$
+
+```{r include = FALSE}
+data("iris")
+var.endogena <- iris[,1]
+var.explicativa <- iris[,2]
+datos <- data.frame(cbind(var.endogena, var.explicativa))
+```
+
+
+## Construcción del modelo
+```{r}
+ajuste <- lm(var.endogena~var.explicativa, data = datos)
+
+coeficientes <- ajuste$coefficients
+valores.ajustados <- ajuste$fitted.values
+residuos <- ajuste$residuals
+gl.residuos <- ajuste$df.residual # grados de libertad de los residuos
+gl.modelo <- ajuste$rank          # grados de libertad del modelo
+```
+
+
+## Intervalos de confianza y contrastes sobre los parámetros
+## Bondad del ajuste
+## Diagnosis del modelo
+## Análisis de influencia
+## Predicciones
+
+
+# Regresión lineal múltiple
+
+# Regresión logística
+## prueba
+### más pruebas
