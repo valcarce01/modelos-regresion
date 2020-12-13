@@ -1,5 +1,10 @@
 ---
 title: "Modelos de regresión"
+author:
+- Xiangnging
+- $\pi$ter
+- João
+- VR
 output: 
   prettydoc::html_pretty:
     theme: leonids
@@ -25,6 +30,8 @@ library(MASS)
 library(car)
 library(lmtest)
 library(tseries)
+library(caret)
+valores.predecir <- c(1, 2, 3)
 ```
 
 
@@ -89,7 +96,9 @@ cvRes <- DAAG::CVlm(data=datos, form.lm=var.endogena~var.explicativa,
 
 ## Diagnosis del modelo
 ```{r}
-res.est <- MASS::stdres(ajuste)    # estudentizados internamente (o "estandarizados") 
+# Residuos del ajuste
+res.est  <- MASS::stdres(ajuste)    # estandarizados
+res.stud <- MASS::studres(ajuste)   # estudentizados 
 ```
 
 Vamos a corroborar las hipótesis estructurales del modelo: linealidad, homoscedasticidad
@@ -188,9 +197,55 @@ car::ncvTest(ajuste)     # equivale a bptest(ajuste,studentize = FALSE)
 lmtest::bptest(ajuste)   # LA RECOMENDACIÓN
 ```
 
+## Transformaciones BoxCox
+```{r}
+lambda <- caret::BoxCoxTrans(var.endogena)
+# BoxCoxTrans devuelve el lambda, por lo que tenemos que aplicarlo a 
+# nuestra variable
+var.endogena.transformada <- predict(lambda, var.endogena)
+ajuste.transformado <- lm(var.endogena.transformada~var.explicativa)
+```
+
 
 ## Análisis de influencia {#influence}
+```{r results="hide"}
+influencia <- influence(ajuste)
+# Leverages (diagonales de la "matriz sombrero")
+lev <- influencia$hat # también se pueden obtener usando hatvalues(ajuste)
+# Distancias de Cook (gráfica influida en plot(ajuste))
+distancia.cook <- cooks.distance(ajuste)
+
+# DFFITS
+dfajuste <- dffits(ajuste)
+# Chequeamos sí:
+sum(abs(dfajuste) > 2*sqrt(1/length(var.explicativa)))
+# DFBETAS
+dfbeta <- influencia$coefficients  # o dfbetas(ajuste)
+
+# Cambio en la desviación estándar residual al eliminar cada punto
+cambio.sd <- influencia$sigma
+```
+
+
 ## Predicciones
+```{r results="hide"}
+# Intervalos de confianza al 90% para E(Y|X=x_i):
+banda.conf.90 <- predict(ajuste, se.fit = TRUE,
+                         interval = "confidence", level = 0.90)
+
+# Intervalos de predicción al 90% para Y|X=x_i:
+banda.pred.90 <- predict(ajuste, se.fit = TRUE, 
+                         interval = "prediction", level = 0.90)
+```
+
+Si queremos predecir para unos valores concretos, debemos crear un dataframe
+que contenga los valores de dónde queremos predecir y el nombre de la columna
+ha de ser el nombre de la variable explicativa original (si no, no funciona):
+```{r}
+new.data <- data.frame(var.explicativa = valores.predecir)
+IC.90 <- predict(ajuste, se.fit = TRUE, newdata = new.data,
+                         interval = "confidence", level = 0.90)
+```
 
 
 # Regresión lineal múltiple

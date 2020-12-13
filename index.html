@@ -11,6 +11,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<meta name="author" content="Xiangnging" />
+<meta name="author" content="\piter" />
+<meta name="author" content="João" />
+<meta name="author" content="VR" />
 
 
 <title>Modelos de regresión</title>
@@ -187,6 +191,10 @@ a.sourceLine {
 <div class="table cover">
 <div class="cover-card table-cell table-middle">
 <span class="author_name">Modelos de regresión</span>
+<span class="author_bio mbm">Xiangnging</span>
+<span class="author_bio mbm"><span class="math inline">\(\pi\)</span>ter</span>
+<span class="author_bio mbm">João</span>
+<span class="author_bio mbm">VR</span>
 </div>
 </div>
 </div>
@@ -209,6 +217,7 @@ a.sourceLine {
 <li><a href="#aleatoriedad">Aleatoriedad</a></li>
 <li><a href="#homoscedasticidad">Homoscedasticidad</a></li>
 </ul></li>
+<li><a href="#transformaciones-boxcox">Transformaciones BoxCox</a></li>
 <li><a href="#influence">Análisis de influencia</a></li>
 <li><a href="#predicciones">Predicciones</a></li>
 </ul></li>
@@ -286,7 +295,9 @@ a.sourceLine {
 </div>
 <div id="diagnosis-del-modelo" class="section level2">
 <h2>Diagnosis del modelo</h2>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>res.est &lt;-<span class="st"> </span>MASS<span class="op">::</span><span class="kw">stdres</span>(ajuste)    <span class="co"># estudentizados internamente (o &quot;estandarizados&quot;) </span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Residuos del ajuste</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>res.est  &lt;-<span class="st"> </span>MASS<span class="op">::</span><span class="kw">stdres</span>(ajuste)    <span class="co"># estandarizados</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a>res.stud &lt;-<span class="st"> </span>MASS<span class="op">::</span><span class="kw">studres</span>(ajuste)   <span class="co"># estudentizados </span></span></code></pre></div>
 <p>Vamos a corroborar las hipótesis estructurales del modelo: linealidad, homoscedasticidad normalidad y aleatoriedad. Con <code>plot(ajuste)</code> tenemos acceso a diversas gráficas que pueden ser de ayuda:</p>
 <table>
 <colgroup>
@@ -402,11 +413,46 @@ H_1&amp;:&amp; \sigma^2 \neq cte
 <span id="cb10-5"><a href="#cb10-5"></a>lmtest<span class="op">::</span><span class="kw">bptest</span>(ajuste)   <span class="co"># LA RECOMENDACIÓN</span></span></code></pre></div>
 </div>
 </div>
+<div id="transformaciones-boxcox" class="section level2">
+<h2>Transformaciones BoxCox</h2>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>lambda &lt;-<span class="st"> </span>caret<span class="op">::</span><span class="kw">BoxCoxTrans</span>(var.endogena)</span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="co"># BoxCoxTrans devuelve el lambda, por lo que tenemos que aplicarlo a </span></span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="co"># nuestra variable</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a>var.endogena.transformada &lt;-<span class="st"> </span><span class="kw">predict</span>(lambda, var.endogena)</span>
+<span id="cb11-5"><a href="#cb11-5"></a>ajuste.transformado &lt;-<span class="st"> </span><span class="kw">lm</span>(var.endogena.transformada<span class="op">~</span>var.explicativa)</span></code></pre></div>
+</div>
 <div id="influence" class="section level2">
 <h2>Análisis de influencia</h2>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>influencia &lt;-<span class="st"> </span><span class="kw">influence</span>(ajuste)</span>
+<span id="cb12-2"><a href="#cb12-2"></a><span class="co"># Leverages (diagonales de la &quot;matriz sombrero&quot;)</span></span>
+<span id="cb12-3"><a href="#cb12-3"></a>lev &lt;-<span class="st"> </span>influencia<span class="op">$</span>hat <span class="co"># también se pueden obtener usando hatvalues(ajuste)</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a><span class="co"># Distancias de Cook (gráfica influida en plot(ajuste))</span></span>
+<span id="cb12-5"><a href="#cb12-5"></a>distancia.cook &lt;-<span class="st"> </span><span class="kw">cooks.distance</span>(ajuste)</span>
+<span id="cb12-6"><a href="#cb12-6"></a></span>
+<span id="cb12-7"><a href="#cb12-7"></a><span class="co"># DFFITS</span></span>
+<span id="cb12-8"><a href="#cb12-8"></a>dfajuste &lt;-<span class="st"> </span><span class="kw">dffits</span>(ajuste)</span>
+<span id="cb12-9"><a href="#cb12-9"></a><span class="co"># Chequeamos sí:</span></span>
+<span id="cb12-10"><a href="#cb12-10"></a><span class="kw">sum</span>(<span class="kw">abs</span>(dfajuste) <span class="op">&gt;</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span><span class="kw">sqrt</span>(<span class="dv">1</span><span class="op">/</span><span class="kw">length</span>(var.explicativa)))</span>
+<span id="cb12-11"><a href="#cb12-11"></a><span class="co"># DFBETAS</span></span>
+<span id="cb12-12"><a href="#cb12-12"></a>dfbeta &lt;-<span class="st"> </span>influencia<span class="op">$</span>coefficients  <span class="co"># o dfbetas(ajuste)</span></span>
+<span id="cb12-13"><a href="#cb12-13"></a></span>
+<span id="cb12-14"><a href="#cb12-14"></a><span class="co"># Cambio en la desviación estándar residual al eliminar cada punto</span></span>
+<span id="cb12-15"><a href="#cb12-15"></a>cambio.sd &lt;-<span class="st"> </span>influencia<span class="op">$</span>sigma</span></code></pre></div>
 </div>
 <div id="predicciones" class="section level2">
 <h2>Predicciones</h2>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="co"># Intervalos de confianza al 90% para E(Y|X=x_i):</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a>banda.conf<span class="fl">.90</span> &lt;-<span class="st"> </span><span class="kw">predict</span>(ajuste, <span class="dt">se.fit =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb13-3"><a href="#cb13-3"></a>                         <span class="dt">interval =</span> <span class="st">&quot;confidence&quot;</span>, <span class="dt">level =</span> <span class="fl">0.90</span>)</span>
+<span id="cb13-4"><a href="#cb13-4"></a></span>
+<span id="cb13-5"><a href="#cb13-5"></a><span class="co"># Intervalos de predicción al 90% para Y|X=x_i:</span></span>
+<span id="cb13-6"><a href="#cb13-6"></a>banda.pred<span class="fl">.90</span> &lt;-<span class="st"> </span><span class="kw">predict</span>(ajuste, <span class="dt">se.fit =</span> <span class="ot">TRUE</span>, </span>
+<span id="cb13-7"><a href="#cb13-7"></a>                         <span class="dt">interval =</span> <span class="st">&quot;prediction&quot;</span>, <span class="dt">level =</span> <span class="fl">0.90</span>)</span></code></pre></div>
+<pre><code>## Warning in predict.lm(ajuste, se.fit = TRUE, interval = &quot;prediction&quot;, level = 0.9): predictions on current data refer to _future_ responses</code></pre>
+<p>Si queremos predecir para unos valores concretos, debemos crear un dataframe que contenga los valores de dónde queremos predecir y el nombre de la columna ha de ser el nombre de la variable explicativa original (si no, no funciona):</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>new.data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">var.explicativa =</span> valores.predecir)</span>
+<span id="cb15-2"><a href="#cb15-2"></a>IC<span class="fl">.90</span> &lt;-<span class="st"> </span><span class="kw">predict</span>(ajuste, <span class="dt">se.fit =</span> <span class="ot">TRUE</span>, <span class="dt">newdata =</span> new.data,</span>
+<span id="cb15-3"><a href="#cb15-3"></a>                         <span class="dt">interval =</span> <span class="st">&quot;confidence&quot;</span>, <span class="dt">level =</span> <span class="fl">0.90</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="regresión-lineal-múltiple" class="section level1">
