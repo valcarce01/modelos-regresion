@@ -203,8 +203,13 @@ a.sourceLine {
 <li><a href="#contrastes-de-hipótesis">Contrastes de hipótesis</a></li>
 </ul></li>
 <li><a href="#bondad-del-ajuste">Bondad del ajuste</a></li>
-<li><a href="#diagnosis-del-modelo">Diagnosis del modelo</a></li>
-<li><a href="#análisis-de-influencia">Análisis de influencia</a></li>
+<li><a href="#diagnosis-del-modelo">Diagnosis del modelo</a><ul>
+<li><a href="#linealidad">Linealidad</a></li>
+<li><a href="#normalidad">Normalidad</a></li>
+<li><a href="#aleatoriedad">Aleatoriedad</a></li>
+<li><a href="#homoscedasticidad">Homoscedasticidad</a></li>
+</ul></li>
+<li><a href="#influence">Análisis de influencia</a></li>
 <li><a href="#predicciones">Predicciones</a></li>
 </ul></li>
 <li><a href="#regresión-lineal-múltiple">Regresión lineal múltiple</a></li>
@@ -264,12 +269,140 @@ a.sourceLine {
 <span id="cb4-5"><a href="#cb4-5"></a></span>
 <span id="cb4-6"><a href="#cb4-6"></a><span class="co"># Coeficiente de determinación</span></span>
 <span id="cb4-7"><a href="#cb4-7"></a>R2 &lt;-<span class="st"> </span>resumen<span class="op">$</span>r.squared</span>
-<span id="cb4-8"><a href="#cb4-8"></a>R2.ajustado &lt;-<span class="st"> </span>resumen<span class="op">$</span>adj.r.squared</span></code></pre></div>
+<span id="cb4-8"><a href="#cb4-8"></a>R2.ajustado &lt;-<span class="st"> </span>resumen<span class="op">$</span>adj.r.squared</span>
+<span id="cb4-9"><a href="#cb4-9"></a></span>
+<span id="cb4-10"><a href="#cb4-10"></a><span class="co"># AIC, Criterio de Información de Akaike</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a><span class="kw">AIC</span>(ajuste)    <span class="co"># cuanto más pequeño, mejor (más ajustado)</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a><span class="co"># BIC, Criterio de Información Bayesiano (lo mismo, pero teniendo en cuenta</span></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="co"># el número de datos que tenemos)</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a><span class="kw">BIC</span>(ajuste)    <span class="co"># cuanto más pequeño, mejor (más ajustado)</span></span>
+<span id="cb4-15"><a href="#cb4-15"></a></span>
+<span id="cb4-16"><a href="#cb4-16"></a><span class="co"># Validación cruzada</span></span>
+<span id="cb4-17"><a href="#cb4-17"></a><span class="co"># hace un plot además con los &#39;distintos&#39; modelos creados</span></span>
+<span id="cb4-18"><a href="#cb4-18"></a>cvRes &lt;-<span class="st"> </span>DAAG<span class="op">::</span><span class="kw">CVlm</span>(<span class="dt">data=</span>datos, <span class="dt">form.lm=</span>var.endogena<span class="op">~</span>var.explicativa,</span>
+<span id="cb4-19"><a href="#cb4-19"></a>                    <span class="dt">m=</span><span class="dv">5</span>, <span class="dt">dots=</span><span class="ot">FALSE</span>, <span class="dt">seed=</span><span class="dv">29</span>, <span class="dt">plotit=</span><span class="st">&quot;Observed&quot;</span>, </span>
+<span id="cb4-20"><a href="#cb4-20"></a>                    <span class="dt">legend.pos=</span><span class="st">&quot;topleft&quot;</span>, </span>
+<span id="cb4-21"><a href="#cb4-21"></a>                    <span class="dt">printit =</span> <span class="ot">FALSE</span>, <span class="dt">main=</span><span class="st">&quot;&quot;</span>)</span></code></pre></div>
 </div>
 <div id="diagnosis-del-modelo" class="section level2">
 <h2>Diagnosis del modelo</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>res.est &lt;-<span class="st"> </span>MASS<span class="op">::</span><span class="kw">stdres</span>(ajuste)    <span class="co"># estudentizados internamente (o &quot;estandarizados&quot;) </span></span></code></pre></div>
+<p>Vamos a corroborar las hipótesis estructurales del modelo: linealidad, homoscedasticidad normalidad y aleatoriedad. Con <code>plot(ajuste)</code> tenemos acceso a diversas gráficas que pueden ser de ayuda:</p>
+<table>
+<colgroup>
+<col width="30%"></col>
+<col width="39%"></col>
+<col width="30%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th align="center">¿Qué representa?</th>
+<th align="center">¿Qué comprobamos?</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>plot(ajuste, which = 1)</code></td>
+<td align="center">Valores ajustados ~ Residuos</td>
+<td align="center">Linealidad</td>
+</tr>
+<tr class="even">
+<td><code>plot(ajuste, which = 2)</code></td>
+<td align="center">QQ Plot</td>
+<td align="center">Normalidad</td>
+</tr>
+<tr class="odd">
+<td><code>plot(ajuste, which = 3)</code></td>
+<td align="center">Valores ajustados ~ Residuos estandarizados</td>
+<td align="center">Homoscedasticidad</td>
+</tr>
+<tr class="even">
+<td><code>plot(ajuste, which = 4)</code></td>
+<td align="center">Distancias de Cook</td>
+<td align="center"><a href="#influence">Datos influyentes</a></td>
+</tr>
+<tr class="odd">
+<td><code>plot(ajuste, which = 5)</code></td>
+<td align="center">Leverage ~ Residuos estandarizados</td>
+<td align="center"><a href="#influence">Datos influyentes</a></td>
+</tr>
+</tbody>
+</table>
+<p>Pruebas analíticas:</p>
+<div id="linealidad" class="section level3">
+<h3>Linealidad</h3>
+<p>Contraste de linealidad. <span class="math display">\[
+\left\lbrace
+\begin{matrix}
+H_0&amp;:&amp; \mathbb{E}(\text{var.endogena}_i|\text{var.explicativa}_i) = 
+\beta_0 + \beta_1\cdot f \\
+H_1&amp;:&amp; \mathbb{E}(\text{var.endogena}_i|\text{var.explicativa}_i) = 
+\mu(\text{var.explicativa})
+\end{matrix}
+\right.
+\]</span></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># La hipótesis alternativa la podemos expresar como una regresión de variables</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a><span class="co"># cualitativas:</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a>var.explicativa.factor &lt;-<span class="st"> </span><span class="kw">as.factor</span>(var.explicativa)</span>
+<span id="cb6-4"><a href="#cb6-4"></a>ajuste.factor &lt;-<span class="st"> </span><span class="kw">lm</span>(var.endogena<span class="op">~</span>var.explicativa.factor, <span class="dt">data =</span> datos)</span>
+<span id="cb6-5"><a href="#cb6-5"></a><span class="kw">anova</span>(ajuste, ajuste.factor)</span>
+<span id="cb6-6"><a href="#cb6-6"></a></span>
+<span id="cb6-7"><a href="#cb6-7"></a><span class="co"># Ilustración gráfica:</span></span>
+<span id="cb6-8"><a href="#cb6-8"></a>medias &lt;-<span class="st"> </span><span class="kw">tapply</span>(var.endogena, var.explicativa, mean) </span>
+<span id="cb6-9"><a href="#cb6-9"></a><span class="kw">plot</span>(var.explicativa, var.endogena, <span class="dt">xlab=</span><span class="st">&quot;endógena&quot;,ylab=&quot;</span>explicativa<span class="st">&quot;, </span></span>
+<span id="cb6-10"><a href="#cb6-10"></a><span class="st">     pch = 21, bg = &quot;</span>green<span class="st">&quot;, cex.lab=1.5, cex=0.9, cex.main=1.5)</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a><span class="st"># Ajuste bajo H_0</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a><span class="st">abline(ajuste, col=&quot;</span>magenta<span class="st">&quot;, lwd=2)</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a><span class="st"># Ajuste bajo H_1</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a><span class="st">points(levels(var.explicativa.factor),medias,pch=&quot;</span><span class="op">-</span><span class="st">&quot;,cex=3,col=&quot;</span>blue<span class="st">&quot;)</span></span>
+<span id="cb6-15"><a href="#cb6-15"></a><span class="st">legend(&quot;</span>topleft<span class="st">&quot;,c(expression(H[0]),expression(H[1])),</span></span>
+<span id="cb6-16"><a href="#cb6-16"></a><span class="st">       col=c(&quot;</span>magenta<span class="st">&quot;,&quot;</span>blue<span class="st">&quot;),lty=c(1,1), cex=1.5)</span></span></code></pre></div>
+<p><strong>Nota:</strong> no se puede hacer si para muchas de las <span class="math inline">\(x_i\)</span> no tenemos varias <span class="math inline">\(y_i\)</span>.</p>
 </div>
-<div id="análisis-de-influencia" class="section level2">
+<div id="normalidad" class="section level3">
+<h3>Normalidad</h3>
+<p>Gráficamente, a parte del QQ-Plot, se puede comprobar mediante el histograma, densidad y diagrama de cajas de los residuos.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>nortest<span class="op">::</span><span class="kw">lillie.test</span>(res.est) <span class="co"># Prueba de Lilliefors</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="co"># Para muestras pequeñas:</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a><span class="kw">shapiro.test</span>(res.est)         <span class="co"># Prueba de Shapiro-Wilks</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a>moments<span class="op">::</span><span class="kw">agostino.test</span>(res.est)         <span class="co"># Prueba de D&#39;Agostiino</span></span>
+<span id="cb7-5"><a href="#cb7-5"></a><span class="co"># Para confirmar la influencia de las colas</span></span>
+<span id="cb7-6"><a href="#cb7-6"></a>nortest<span class="op">::</span><span class="kw">ad.test</span>(res.est)     <span class="co"># Prueba de Anderson-Darling</span></span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="co"># Test no paramétrico</span></span>
+<span id="cb7-8"><a href="#cb7-8"></a>nortest<span class="op">::</span><span class="kw">cvm.test</span>(res.est)    <span class="co"># Prueba de Cramer Von-Mises</span></span>
+<span id="cb7-9"><a href="#cb7-9"></a></span>
+<span id="cb7-10"><a href="#cb7-10"></a>normtest<span class="op">::</span><span class="kw">skewness.norm.test</span>(res.est)   <span class="co"># Basada en asimetría</span></span>
+<span id="cb7-11"><a href="#cb7-11"></a>normtest<span class="op">::</span><span class="kw">kurtosis.norm.test</span>(res.est)   <span class="co"># Basada en kurtosis</span></span>
+<span id="cb7-12"><a href="#cb7-12"></a>normtest<span class="op">::</span><span class="kw">jb.norm.test</span>(res.est)         <span class="co"># prueba de Jarque-Bera (comprueba</span></span>
+<span id="cb7-13"><a href="#cb7-13"></a><span class="co"># la asimetría y kurtosis a la vez)</span></span></code></pre></div>
+</div>
+<div id="aleatoriedad" class="section level3">
+<h3>Aleatoriedad</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">Box.test</span>(res.est, <span class="dt">lag =</span> <span class="dv">5</span>, <span class="dt">type =</span> <span class="st">&quot;Ljung-Box&quot;</span>)       <span class="co"># Prueba de Ljung-Box</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="kw">acf</span>(res.est, <span class="dt">lag.max =</span> <span class="dv">10</span>, <span class="dt">type =</span> <span class="st">&quot;correlation&quot;</span>)<span class="op">$</span>acf <span class="co"># Autocorrelaciones</span></span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>tseries<span class="op">::</span><span class="kw">runs.test</span>(<span class="kw">as.factor</span>(<span class="kw">sign</span>(res.est)))           <span class="co"># Prueba de rachas</span></span></code></pre></div>
+<p><strong>Nota:</strong> solo tiene sentido realizarlo si tenemos almacenado cómo (orden cronológico) se han recogido los datos.</p>
+<p><strong>Nota 2:</strong> si no aceptamos la hipótesis de <a href="#normalidad">normalidad</a> no conseguimos nada aceptando la existencia de aleatoriedad.</p>
+</div>
+<div id="homoscedasticidad" class="section level3">
+<h3>Homoscedasticidad</h3>
+<p><span class="math display">\[
+\left\lbrace
+\begin{matrix}
+H_0&amp;:&amp; \sigma^2 = cte \\
+H_1&amp;:&amp; \sigma^2 \neq cte
+\end{matrix}
+\right.
+\]</span></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="co"># Test de Breusch-Pagan:</span></span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="co"># H0: E(epsilon^2|X) = alpha0</span></span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="co"># H1: E(epsilon^2|X) = alpha0 + alpha1X</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a>car<span class="op">::</span><span class="kw">ncvTest</span>(ajuste)     <span class="co"># equivale a bptest(ajuste,studentize = FALSE)</span></span>
+<span id="cb10-5"><a href="#cb10-5"></a>lmtest<span class="op">::</span><span class="kw">bptest</span>(ajuste)   <span class="co"># LA RECOMENDACIÓN</span></span></code></pre></div>
+</div>
+</div>
+<div id="influence" class="section level2">
 <h2>Análisis de influencia</h2>
 </div>
 <div id="predicciones" class="section level2">
