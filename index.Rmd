@@ -1,7 +1,7 @@
 ---
 title: "Modelos de regresión"
 author:
-- Xiangnging
+- Xiangning
 - $\pi$ter
 - João
 - VR
