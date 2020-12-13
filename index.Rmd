@@ -14,6 +14,13 @@ output:
     fig_width: 10 
     fig_height: 5
 ---
+
+```{r configuraciones, include=F}
+knitr::opts_chunk$set(
+  eval=F
+)
+```
+
 Renuncia de responsibilidad.
 
 # Regresión lineal simple
@@ -248,7 +255,451 @@ IC.90 <- predict(ajuste, se.fit = TRUE, newdata = new.data,
 ```
 
 
+
+
+
+
 # Regresión lineal múltiple
+
+
+## Modelo matemático
+
+$$
+\vec{Y} = \vec{\beta} \mathbf{X} + \vec{\varepsilon}
+$$
+
+## Ajuste del modelo
+
+#### Con todas las variables del conjunto de datos
+```{r}
+ajuste <- lm(var.endogena~., data=conjunto.datos)
+
+coeficientes <- ajuste$coefficients; coeficientes <- coef(ajuste)
+```
+
+#### Con algunas variables del conjunto de datos
+```{r}
+ajuste <- lm(var.endogena~explicativa1+explicativa2+explicativa3,
+             data=conjunto.datos)
+```
+
+#### Crear un nuevo modelo añadiendo/quitando variables
+Ejemplo quitar las explicativas 1 y 2, añadir la 4 y la 5.
+```{r}
+ajuste2 <- update(ajuste, ~. -explicativa1 - explicativa2
+                  +explicativa4 + explicativa5, data=conjunto.datos)
+```
+
+
+
+## Inferencia
+
+### Intervalos de confianza
+
+#### Para los parámetros individuales
+```{r}
+ci.individual <- confint(ajuste, level=0.95)
+```
+
+#### Para $\sigma^2$
+```{r}
+LS.IC.var <- gl.residuos * MSSR / qchisq(p=0.05, df=gl.residuos)   
+```
+
+#### Región de confianza
+
+| Parámetros            | Significado                         |
+|:---------------------:|:-----------------------------------:|
+| **which.coef**        | Índices de los coeficientes a usar  |
+| **levels**            | Vector con los niveles de confianza |
+
+```{r}
+confidenceEllipse(model=ajuste, which.coef=1:2, levels=c(0.80,0.90,0.95))
+```
+
+
+### Contrastes de Hipótesis
+
+#### Contraste de Regresión:
+$$
+\begin{cases}
+  H_0: \beta_1=\beta_2=\dots=\beta_k=0 \\
+  H_1: \exists j \in \{1,\dots,k\}, \ \beta_j\neq 0
+\end{cases}
+$$
+**Con summary**:
+
+Es el estadístico F del resumen
+```{r}
+summary(modelo)
+```
+
+**A mano con anova**:
+
+Modelo nulo (Bajo $H_0$)
+```{r}
+modelo.nulo <- lm(calidad ~ 1, data = conjunto.datos)
+```
+
+Modelo completo (Bajo $H_1$)
+```{r}
+modelo.completo <- ajuste
+```
+
+Contraste
+```{r}
+anova(modelo.nulo, modelo.completo)
+```
+
+
+
+
+
+## Bondad del ajuste:
+
+### Coeficiente de determinación ($R^2$)
+```{r}
+summary(ajuste)$r.squared
+```
+
+### Coeficiente de determinación ajustado ($R^2_{adj}$)
+```{r}
+summary(ajuste)$adj.r.squared
+```
+
+
+
+
+
+
+## Diagnosis del modelo
+
+## Análisis de influencia
+Se realiza con las funciones ``influence`` y ``measures.influence()``
+
+```{r}
+influencia <- influence(ajustes)
+```
+
+```{r}
+leverage <- influencia$hat # Valores de leverage
+```
+
+Si los datos tienen nombres en las filas se puede hacer una gráfica de leverage
+e identificarlos haciendo click con la función ``identify`` y termiando
+pulsando la tecla ``ESC``.
+```{r}
+plot(leverage)
+identify(leverage, labels=row.names(conjunto.datos))
+```
+
+
+### DFBETAS
+```{r}
+DFBETAS <- influencia$coefficients
+```
+
+### Para obtener diferentes medidas diagnósticas
+**(DFBETAS, DFFITS, COVRATIO y distancia D de Cook)**
+
+Marca los puntos influyentes con un asterisco en la columna inf
+```{r}
+puntos.influyentes <- influence.measures(ajuste)
+```
+
+**Resumen de puntos influyentes:**
+```{r}
+summary(puntos.influyentes)
+```
+
+Para ver para cada dato del conjunto si es influyente (verdadero o falso) 
+según los distintos criterios se puede utilizar:
+```{r}
+puntos.influyentes$is.inf
+```
+
+
+### Gráficas
+**Librería ``olsrr``**
+```{r}
+# Distancia D de Cook
+ols_plot_cooksd_bar(ajuste)
+ols_plot_cooksd_chart(ajuste)
+# DFFITS
+ols_plot_dffits(ajuste)
+#DFBETAs
+ols_plot_dfbetas(ajuste)
+# RESIDUOS ESTUDENTIZADOS
+ols_plot_resid_stud(ajuste)
+```
+
+
+
+
+
+## Predicciones
+
+
+
+
+
+
+## Criterios para la detección de multicolinealidad
+```{r}
+correlaciones <- cor(conjunto.datos)
+
+det(correlaciones) # Si es muy cercano a cero hay alta multicolinealidad.
+```
+
+
+### Factores de Inflación de la Varianza
+```{r}
+FIV <- faraway::vif(ajuste)
+```
+
+Como criterio $\mathrm{FIV}_i > 10 \Longrightarrow$ Alta multicolinealidad.
+
+Compararemos los FIV con $\dfrac{1}{1-R^2}$
+```{r}
+umbral <- 1/(1-summary(ajuste)$r.squared)
+print(FIV[FIV>umbral])
+```
+
+### Índice de Condicionamiento
+
+- $IC < 10 \Longrightarrow$ Ausencia de multicolinealidad
+
+- $10 \leq IC \leq 30 \Longrightarrow$ Multicolinealidad moderada
+
+- $IC > 30 \Longrightarrow$ Alta multicolinealidad
+
+(Lo calcula la función ``mctest`` con ``type="o"`` (por defecto),
+véase en el último apartado).
+
+
+### Componentes principales
+Comprobar si unas pocas componentes principales explican
+una gran cantidad de varianza.
+```{r}
+pca <- prcomp(conjunto.datos, scale=T)
+summary(pca)
+```
+
+
+
+### Análisis de multicolinealidad completo
+| Parámetros          | Significado                           |
+|:-------------------:|:-------------------------------------:|
+| **type**            | "o" (por defecto) para todos los datos, "i" para las variables de forma individual |
+| **method**          | Métodos a utilizar: ej: ``"VIF"``, ``"TOL"``  |
+| **corr**            | Verdadero o Falso para mostrar la matriz de correlaciones junto a los resultados |
+
+```{r}
+mctest::mctest(ajuste, type="o")
+mctest::mctest(ajuste, type="i", corr=T) 
+mctest::mctest(ajuste, type="i", method = "VIF") 
+mctest::mctest(ajuste, type="i", method = "TOL") 
+```
+
+
+
+
+## Criterios para selección de modelos
+
+### Criterio MSS(R): ANOVA para modelos anidados
+```{r}
+modelo.completo <- lm(variable.endogena~., data=conjunto.datos)
+
+# Modelo con menos variables
+modelo.anidado <- lm(variable.endogena~explicativa1+explicativa2)
+
+anova(modelo.anidado, modelo.completo)
+```
+
+### Criterio $C_p$ de Mallows
+
+Cuanto más cercano sea $C_p$ a $p$ (y preferiblemente tomando valores
+inferiores) mejor es el ajuste.
+
+| Parámetros          | Significado                           |
+|:-------------------:|:-------------------------------------:|
+| **x**               | Matriz con las variables explicativas |
+| **y**               | Vector con la variable respuesta      |
+
+```{r}
+Cp.residuos <- leaps::leaps(x=conjunto.datos[, 2:4],
+                     y=conjunto.datos[, 1], method="Cp")
+```
+
+Una forma de ver los $C_p$ de Mallows como tabla, incluyendo columnas
+que indican si la variable está presente en el modelo (1) o no (0) y el número
+total de parámetros en el modelo es:
+```{r}
+cbind(Cp.residuos$which, p=Cp.residuos$size, Cp=Cp.residuos$Cp)
+```
+
+### Criterio de información de Akaike
+Calcula la verosimilitud del modelo penalizando por el número de variables.
+```{r}
+AIC(ajuste)    # cuanto más pequeño, mejor (más ajustado)
+```
+
+### Criterio de Información Bayesiano (Schwarz)
+A diferencia del de Akaike tiene en cuenta el número de datos que tenemos en
+la muestra.
+```{r}
+BIC(ajuste)    # cuanto más pequeño, mejor (más ajustado)
+```
+
+### Estadístico PRESS
+```{r}
+DAAG::press(ajuste)   # cuanto más pequeño, mejor (más ajustado)
+```
+
+
+
+
+
+
+## Selección de variables
+
+### Comparar el modelo al eliminar una explicativa
+El parámetro ``test="F" `` nos devuelve el valor del estadístico $F$
+```{r}
+drop1(ajuste, test="F")
+```
+
+### Comparar el modelo al añadir una explicativa
+
+- En ``scope`` añadimos como rango inferior ``~.`` (el ajuste que ya tenemos)
+Y las variables que queramos considerar añadir con +
+
+- El parámetro ``test="F"`` nos devuelve el valor del estadístico $F$
+
+```{r}
+add1(ajuste, scope= ~.+explicativa.2+explicativa.3, test="F",
+     data=conjunto.datos)
+```
+
+También podemos considerar añadir **cualquier variable del conjunto de datos**
+usando el modelo completo.
+```{r}
+modelo.completo <- lm(var.endogena~., data=conjunto.datos)
+add1(ajuste, scope=modelo.completo, test="F")
+```
+
+
+### Selección sistemática de un subconjunto de variables
+```{r}
+# Modelo que contiene solo el intercept
+modelo.intercept <- lm(var.endogena~1, data=conjunto.datos)
+
+# Modelo completo con todas las regresoras
+modelo.completo <- lm(var.endogena~., data=conjunto.datos)
+```
+
+
+| Parámetros | Significado                           |
+|:----------:|:-------------------------------------:|
+| **object**     | Modelo de partida |
+| **scope**      | lista de la forma ``list(lower=a, upper=b)`` con el rango de modelos anidados a considerar |
+| **direction**  | modo de regresión paso a paso (``"both"`` (por defecto), ``"backward"`` o ``"forward"``)|
+| **trace**      | 1 (por defecto) o 0 según se quiera o no ver los resultados intermedios |
+| **k**          | Por defecto k=2 (indica AIC), si se pone k=log(n) se utiliza el criterio BIC, aunque en la salida seguirá poniendo AIC |
+```{r}
+step.modelo <- step(modelo.intercept,
+                    scope=list(lower=modelo.intercept, upper=modelo.completo),
+                    direction="both", trace=1)
+```
+
+Si no se especifica el parámetro **scope** se utiliza todo el rango de modelos pero la dirección utilizada será ``"backward"``
+```{r}
+step(modelo.completo)
+```
+
+**Resumen del proceso**
+```{r}
+step.modelo$anova
+```
+
+**Grados de libertad de la parte explicada por el modelo y AIC**
+```{r}
+extractAIC(step.modelo)
+```
+
+
+### Eliminación progresiva de variables
+```{r}
+step.backward <- step(modelo.completo, direction="backward", trace=1)
+```
+
+
+### Introducción progresiva de variables
+```{r}
+step.forward <- step(modelo.intercept,
+                     scope=list(lower=modelo.intercept, upper=modelo.completo),
+                     direction="forward", trace=1)
+```
+
+### Búsqueda exhaustiva con la librería leaps
+
+| Parámetros  | Significado                           |
+|:-----------:|:-------------------------------------:|
+| **nbest**   | Número de modelos a seleccionar para cada número de variables, ej: con 1 se devuelve el mejor subconjunto con una sola variable|
+| **nvmax**   | Número máximo de variables a considerar  |
+```{r}
+modelo.exhaustivo <- leaps::regsubsets(var.endogena ~.,
+                                       data=conjunto.datos, nbest=1)
+```
+
+Para ver los resultados, emplear ``summary()``
+```{r}
+summary(modelo.exhaustivo)
+```
+
+Además summary() tiene los siguientes atributos:
+
+| Parámetros  | Significado                         |
+|:-----------:|:-----------------------------------:|
+| **rsg**     | $R^2$ de cada modelo                |
+| **adjr2**   | $R^2_{adj}$ de cada modelo          | 
+| **cp**      | $C_p$ de Mallows de cada modelo     |
+| **bic**     | $\mathrm{BIC}$ de cada modelo       |
+| **rss**     | $\mathrm{MSS(R)}$ de cada modelo    |
+
+Viendo los datos en una salida:
+```{r}
+S <- summary(modelo.exhaustivo)
+
+cbind(S$which, round(cbind(rsq=S$rsq, adjr2=S$adjr2, cp=S$cp, bic=S$bic, 
+                           rss=S$rss), 3))
+```
+
+Leaps incluye también plots
+```{r}
+plot(modelo.exhaustivo, scale="adjr2")
+plot(modelo.exhaustivo, scale="bic")
+plot(modelo.exhaustivo, scale="Cp")
+plot(modelo.exhaustivo, scale="r2")
+```
+
+Nótese que el atributo de ``summary`` para el $C_p$ de Mallows tiene c minúscula
+y el del plot del modelo mayúscula
+
+### Vías de evaluación
+
+### Coeficiente de robustez
+$$
+B^2 = \dfrac{\mathrm{SS(R)}}{\mathrm{PRESS}} \qquad \qquad B^2 \in (0,1)
+$$
+```{r}
+B2 <- sum(residuals(ajuste)^2/DAAG::press(ajuste))
+```
+
+
+### Validación Cruzada
+
+
 
 # Regresión logística
 ## prueba
