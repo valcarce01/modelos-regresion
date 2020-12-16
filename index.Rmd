@@ -1,10 +1,10 @@
 ---
 title: "Modelos de regresión"
 author:
-- Xiangning
-- $\pi$ter
-- João
-- VR
+- Ana Xiangning Pereira Ezquerro
+- Pedro Redondo Loureiro
+- João uwu Teodoro Rodrigues
+- Diego Valcarce Ríos
 output: 
   prettydoc::html_pretty:
     theme: leonids
