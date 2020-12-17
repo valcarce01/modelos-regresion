@@ -14,6 +14,9 @@ output:
     fig_height: 5
 bibliography: RYDE.bibtex
 ---
+[$\leftarrow$<span style="color:blue">Vuelta al resumen de Modelos de Regresión</span>](index.html)
+
+
 Se desarolla el algoritmo propuesto por Daniel Peña [-@peña2010regresión] con 
 el siguiente diagrama de flujo:
 ![alt text](files/diagrama_flujo_algoritmo.png "Diagrama de flujo algoritmo de Peña")
