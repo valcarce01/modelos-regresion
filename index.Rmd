@@ -3,7 +3,7 @@ title: "Modelos de regresión"
 author:
 - Ana Xiangning Pereira Ezquerro
 - Pedro Redondo Loureiro
-- João uwu Teodoro Rodrigues
+- João Víctor Teodoro Rodrigues
 - Diego Valcarce Ríos
 output: 
   prettydoc::html_pretty:
@@ -562,6 +562,8 @@ DAAG::press(ajuste)   # cuanto más pequeño, mejor (más ajustado)
 
 
 ## Selección de variables
+Se ha desarrollado el [algoritmo propuesto por Daniel Peña](algo.html) que tiene
+muy encuenta la multicolinealidad.
 
 ### Comparar el modelo al eliminar una explicativa
 El parámetro ``test="F" `` nos devuelve el valor del estadístico $F$
