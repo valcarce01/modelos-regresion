@@ -226,19 +226,23 @@ a.sourceLine {
 <li><a href="#ajuste-del-modelo">Ajuste del modelo</a></li>
 <li><a href="#inferencia-1">Inferencia</a><ul>
 <li><a href="#intervalos-de-confianza-1">Intervalos de confianza</a></li>
+<li><a href="#región-de-confianza-para-dos-parámetros">Región de confianza para dos parámetros</a></li>
 <li><a href="#contrastes-de-hipótesis-1">Contrastes de Hipótesis</a></li>
 </ul></li>
 <li><a href="#bondad-del-ajuste-1">Bondad del ajuste:</a><ul>
 <li><a href="#coeficiente-de-determinación-r2">Coeficiente de determinación (<span class="math inline">\(R^2\)</span>)</a></li>
 <li><a href="#coeficiente-de-determinación-ajustado-r2_adj">Coeficiente de determinación ajustado (<span class="math inline">\(R^2_{adj}\)</span>)</a></li>
 </ul></li>
-<li><a href="#diagnosis-del-modelo-1">Diagnosis del modelo</a></li>
 <li><a href="#análisis-de-influencia">Análisis de influencia</a><ul>
 <li><a href="#dfbetas">DFBETAS</a></li>
 <li><a href="#para-obtener-diferentes-medidas-diagnósticas">Para obtener diferentes medidas diagnósticas</a></li>
 <li><a href="#gráficas">Gráficas</a></li>
 </ul></li>
-<li><a href="#predicciones-1">Predicciones</a></li>
+<li><a href="#predicciones-1">Predicciones</a><ul>
+<li><a href="#intervalos-de-confianza-al-90-para-mathbbeyxx_i">Intervalos de confianza al 90% para <span class="math inline">\(\mathbb{E}(Y|X=x_i)\)</span>:</a></li>
+<li><a href="#intervalos-de-predicción-al-90-para-yxx_i">Intervalos de predicción al 90% para <span class="math inline">\(Y|X=x_i\)</span>:</a></li>
+<li><a href="#intervalos-de-confianzapredicción-al-90-para-nuevas-observaciones">Intervalos de confianza/predicción al 90% para nuevas observaciones</a></li>
+</ul></li>
 <li><a href="#criterios-para-la-detección-de-multicolinealidad">Criterios para la detección de multicolinealidad</a><ul>
 <li><a href="#factores-de-inflación-de-la-varianza">Factores de Inflación de la Varianza</a></li>
 <li><a href="#índice-de-condicionamiento">Índice de Condicionamiento</a></li>
@@ -259,7 +263,9 @@ a.sourceLine {
 <li><a href="#eliminación-progresiva-de-variables">Eliminación progresiva de variables</a></li>
 <li><a href="#introducción-progresiva-de-variables">Introducción progresiva de variables</a></li>
 <li><a href="#búsqueda-exhaustiva-con-la-librería-leaps">Búsqueda exhaustiva con la librería leaps</a></li>
-<li><a href="#vías-de-evaluación">Vías de evaluación</a></li>
+</ul></li>
+<li><a href="#vías-de-evaluación">Vías de evaluación</a><ul>
+<li><a href="#contraste-de-validación">Contraste de validación</a></li>
 <li><a href="#coeficiente-de-robustez">Coeficiente de robustez</a></li>
 <li><a href="#validación-cruzada">Validación Cruzada</a></li>
 </ul></li>
@@ -531,14 +537,22 @@ H_1&amp;:&amp; \sigma^2 \neq cte
 <div id="para-los-parámetros-individuales" class="section level4">
 <h4>Para los parámetros individuales</h4>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>ci.individual &lt;-<span class="st"> </span><span class="kw">confint</span>(ajuste, <span class="dt">level=</span><span class="fl">0.95</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="co"># Devuelve la estimación del parámetro, el intervalo de confianza,</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a><span class="co"># La desviación típica estimada y el p-valor</span></span>
+<span id="cb18-3"><a href="#cb18-3"></a>gmodels<span class="op">::</span><span class="kw">ci</span>(ajuste1, <span class="dt">confidence=</span><span class="fl">0.95</span>)</span></code></pre></div>
 </div>
 <div id="para-sigma2" class="section level4">
 <h4>Para <span class="math inline">\(\sigma^2\)</span></h4>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>LS.IC.var &lt;-<span class="st"> </span>gl.residuos <span class="op">*</span><span class="st"> </span>MSSR <span class="op">/</span><span class="st"> </span><span class="kw">qchisq</span>(<span class="dt">p=</span><span class="fl">0.05</span>, <span class="dt">df=</span>gl.residuos)   </span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>LS.IC.var &lt;-<span class="st"> </span>gl.residuos <span class="op">*</span><span class="st"> </span>MSSR <span class="op">/</span><span class="st"> </span><span class="kw">qchisq</span>(<span class="dt">p=</span><span class="fl">0.05</span>, <span class="dt">df=</span>gl.residuos)   </span></code></pre></div>
 </div>
-<div id="región-de-confianza" class="section level4">
-<h4>Región de confianza</h4>
+</div>
+<div id="región-de-confianza-para-dos-parámetros" class="section level3">
+<h3>Región de confianza para dos parámetros</h3>
 <table>
+<colgroup>
+<col width="38%"></col>
+<col width="61%"></col>
+</colgroup>
 <thead>
 <tr class="header">
 <th align="center">Parámetros</th>
@@ -548,7 +562,7 @@ H_1&amp;:&amp; \sigma^2 \neq cte
 <tbody>
 <tr class="odd">
 <td align="center"><strong>which.coef</strong></td>
-<td align="center">Índices de los coeficientes a usar</td>
+<td align="center">Índices de los coeficientes a usar (El 1 corresponde al intercept)</td>
 </tr>
 <tr class="even">
 <td align="center"><strong>levels</strong></td>
@@ -556,8 +570,15 @@ H_1&amp;:&amp; \sigma^2 \neq cte
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="kw">confidenceEllipse</span>(<span class="dt">model=</span>ajuste, <span class="dt">which.coef=</span><span class="dv">1</span><span class="op">:</span><span class="dv">2</span>, <span class="dt">levels=</span><span class="kw">c</span>(<span class="fl">0.80</span>,<span class="fl">0.90</span>,<span class="fl">0.95</span>))</span></code></pre></div>
-</div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">confidenceEllipse</span>(<span class="dt">model=</span>ajuste, <span class="dt">which.coef=</span><span class="dv">2</span><span class="op">:</span><span class="dv">3</span>, <span class="dt">levels=</span><span class="kw">c</span>(<span class="fl">0.80</span>,<span class="fl">0.90</span>,<span class="fl">0.95</span>))</span></code></pre></div>
+<p>Gráfico superponiendo los intervalos individuales a la región de confianza:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="kw">confidenceEllipse</span>(<span class="dt">model=</span>ajuste1, <span class="dt">which.coef=</span><span class="dv">2</span><span class="op">:</span><span class="dv">3</span>,<span class="dt">levels=</span><span class="fl">0.95</span>)</span>
+<span id="cb21-2"><a href="#cb21-2"></a><span class="kw">segments</span>(ci.individual[<span class="dv">2</span>,<span class="dv">1</span>], <span class="kw">coef</span>(ajuste1)[<span class="dv">3</span>],</span>
+<span id="cb21-3"><a href="#cb21-3"></a>         ci.individual[<span class="dv">2</span>,<span class="dv">2</span>], <span class="kw">coef</span>(ajuste1)[<span class="dv">3</span>], <span class="dt">col=</span><span class="dv">2</span>, <span class="dt">lwd=</span><span class="dv">2</span>)</span>
+<span id="cb21-4"><a href="#cb21-4"></a><span class="kw">segments</span>(<span class="kw">coef</span>(ajuste1)[<span class="dv">2</span>], ci.individual[<span class="dv">3</span>,<span class="dv">1</span>],</span>
+<span id="cb21-5"><a href="#cb21-5"></a>         <span class="kw">coef</span>(ajuste1)[<span class="dv">2</span>], ci.individual[<span class="dv">3</span>,<span class="dv">2</span>], <span class="dt">col=</span><span class="dv">2</span>, <span class="dt">lwd=</span><span class="dv">2</span>)</span>
+<span id="cb21-6"><a href="#cb21-6"></a><span class="kw">abline</span>(<span class="dt">v=</span>ci.individual[<span class="dv">2</span>,], <span class="dt">lty=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>)</span>
+<span id="cb21-7"><a href="#cb21-7"></a><span class="kw">abline</span>(<span class="dt">h=</span>ci.individual[<span class="dv">3</span>,], <span class="dt">lty=</span><span class="dv">2</span>, <span class="dt">col=</span><span class="st">&quot;red&quot;</span>)</span></code></pre></div>
 </div>
 <div id="contrastes-de-hipótesis-1" class="section level3">
 <h3>Contrastes de Hipótesis</h3>
@@ -570,14 +591,14 @@ H_1&amp;:&amp; \sigma^2 \neq cte
 \end{cases}
 \]</span> <strong>Con summary</strong>:</p>
 <p>Es el estadístico F del resumen</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="kw">summary</span>(modelo)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="kw">summary</span>(modelo)</span></code></pre></div>
 <p><strong>A mano con anova</strong>:</p>
 <p>Modelo nulo (Bajo <span class="math inline">\(H_0\)</span>)</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a>modelo.nulo &lt;-<span class="st"> </span><span class="kw">lm</span>(calidad <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> conjunto.datos)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>modelo.nulo &lt;-<span class="st"> </span><span class="kw">lm</span>(var.endogena <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data =</span> conjunto.datos)</span></code></pre></div>
 <p>Modelo completo (Bajo <span class="math inline">\(H_1\)</span>)</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>modelo.completo &lt;-<span class="st"> </span>ajuste</span></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>modelo.completo &lt;-<span class="st"> </span>ajuste</span></code></pre></div>
 <p>Contraste</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="kw">anova</span>(modelo.nulo, modelo.completo)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="kw">anova</span>(modelo.nulo, modelo.completo)</span></code></pre></div>
 </div>
 </div>
 </div>
@@ -585,67 +606,105 @@ H_1&amp;:&amp; \sigma^2 \neq cte
 <h2>Bondad del ajuste:</h2>
 <div id="coeficiente-de-determinación-r2" class="section level3">
 <h3>Coeficiente de determinación (<span class="math inline">\(R^2\)</span>)</h3>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="kw">summary</span>(ajuste)<span class="op">$</span>r.squared</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="kw">summary</span>(ajuste)<span class="op">$</span>r.squared</span></code></pre></div>
 </div>
 <div id="coeficiente-de-determinación-ajustado-r2_adj" class="section level3">
 <h3>Coeficiente de determinación ajustado (<span class="math inline">\(R^2_{adj}\)</span>)</h3>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a><span class="kw">summary</span>(ajuste)<span class="op">$</span>adj.r.squared</span></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a><span class="kw">summary</span>(ajuste)<span class="op">$</span>adj.r.squared</span></code></pre></div>
 </div>
-</div>
-<div id="diagnosis-del-modelo-1" class="section level2">
-<h2>Diagnosis del modelo</h2>
 </div>
 <div id="análisis-de-influencia" class="section level2">
 <h2>Análisis de influencia</h2>
 <p>Se realiza con las funciones <code>influence</code> y <code>measures.influence()</code></p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>influencia &lt;-<span class="st"> </span><span class="kw">influence</span>(ajustes)</span></code></pre></div>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a>leverage &lt;-<span class="st"> </span>influencia<span class="op">$</span>hat <span class="co"># Valores de leverage</span></span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a>influencia &lt;-<span class="st"> </span><span class="kw">influence</span>(ajustes)</span></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a>leverage &lt;-<span class="st"> </span>influencia<span class="op">$</span>hat</span></code></pre></div>
 <p>Si los datos tienen nombres en las filas se puede hacer una gráfica de leverage e identificarlos haciendo click con la función <code>identify</code> y termiando pulsando la tecla <code>ESC</code>.</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="kw">plot</span>(leverage)</span>
-<span id="cb28-2"><a href="#cb28-2"></a><span class="kw">identify</span>(leverage, <span class="dt">labels=</span><span class="kw">row.names</span>(conjunto.datos))</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a><span class="kw">plot</span>(leverage)</span>
+<span id="cb30-2"><a href="#cb30-2"></a><span class="kw">identify</span>(leverage, <span class="dt">labels=</span><span class="kw">row.names</span>(conjunto.datos), <span class="dt">xlab=</span><span class="st">&quot;Índice en la muestra&quot;</span>, <span class="dt">ylab=</span><span class="st">&quot;Leverage&quot;</span>)</span></code></pre></div>
 <div id="dfbetas" class="section level3">
 <h3>DFBETAS</h3>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a>DFBETAS &lt;-<span class="st"> </span>influencia<span class="op">$</span>coefficients</span></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a>DFBETAS &lt;-<span class="st"> </span>influencia<span class="op">$</span>coefficients</span></code></pre></div>
 </div>
 <div id="para-obtener-diferentes-medidas-diagnósticas" class="section level3">
 <h3>Para obtener diferentes medidas diagnósticas</h3>
 <p><strong>(DFBETAS, DFFITS, COVRATIO y distancia D de Cook)</strong></p>
 <p>Marca los puntos influyentes con un asterisco en la columna inf</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a>puntos.influyentes &lt;-<span class="st"> </span><span class="kw">influence.measures</span>(ajuste)</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a>puntos.influyentes &lt;-<span class="st"> </span><span class="kw">influence.measures</span>(ajuste)</span></code></pre></div>
 <p><strong>Resumen de puntos influyentes:</strong></p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a><span class="kw">summary</span>(puntos.influyentes)</span></code></pre></div>
-<p>Para ver para cada dato del conjunto si es influyente (verdadero o falso) según los distintos criterios se puede utilizar:</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a>puntos.influyentes<span class="op">$</span>is.inf</span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a><span class="kw">summary</span>(puntos.influyentes)</span></code></pre></div>
+<p>Para obtener solo la matriz con la puntuación de los datos para las distintas medidas:</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a>puntos.influyentes<span class="op">$</span>infmat</span></code></pre></div>
+<p>Para ver para cada dato del conjunto si es influyente (verdadero o falso) según los distintos criterios:</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a>puntos.influyentes<span class="op">$</span>is.inf</span></code></pre></div>
 </div>
 <div id="gráficas" class="section level3">
 <h3>Gráficas</h3>
-<p><strong>Librería <code>olsrr</code></strong></p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a><span class="co"># Distancia D de Cook</span></span>
-<span id="cb33-2"><a href="#cb33-2"></a><span class="kw">ols_plot_cooksd_bar</span>(ajuste)</span>
-<span id="cb33-3"><a href="#cb33-3"></a><span class="kw">ols_plot_cooksd_chart</span>(ajuste)</span>
-<span id="cb33-4"><a href="#cb33-4"></a><span class="co"># DFFITS</span></span>
-<span id="cb33-5"><a href="#cb33-5"></a><span class="kw">ols_plot_dffits</span>(ajuste)</span>
-<span id="cb33-6"><a href="#cb33-6"></a><span class="co">#DFBETAs</span></span>
-<span id="cb33-7"><a href="#cb33-7"></a><span class="kw">ols_plot_dfbetas</span>(ajuste)</span>
-<span id="cb33-8"><a href="#cb33-8"></a><span class="co"># RESIDUOS ESTUDENTIZADOS</span></span>
-<span id="cb33-9"><a href="#cb33-9"></a><span class="kw">ols_plot_resid_stud</span>(ajuste)</span></code></pre></div>
+<p>Podemos usar <code>dotchart</code> para representar las puntuaciones de los datos para un criterio en concreto</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1"></a>nombres &lt;-<span class="st"> </span><span class="kw">colnames</span>(puntos.influyentes<span class="op">$</span>infmat)</span>
+<span id="cb36-2"><a href="#cb36-2"></a>i &lt;-<span class="st"> </span><span class="dv">1</span> <span class="co"># El índice del criterio a utilizar</span></span>
+<span id="cb36-3"><a href="#cb36-3"></a><span class="kw">dotchart</span>(puntos.influyentes<span class="op">$</span>infmat[,i], <span class="dt">main=</span>nombres[i])</span></code></pre></div>
+<p><strong>Con la librería <code>olsrr</code></strong></p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a><span class="co"># Distancia D de Cook</span></span>
+<span id="cb37-2"><a href="#cb37-2"></a><span class="kw">ols_plot_cooksd_bar</span>(ajuste)</span>
+<span id="cb37-3"><a href="#cb37-3"></a><span class="kw">ols_plot_cooksd_chart</span>(ajuste)</span>
+<span id="cb37-4"><a href="#cb37-4"></a><span class="co"># DFFITS</span></span>
+<span id="cb37-5"><a href="#cb37-5"></a><span class="kw">ols_plot_dffits</span>(ajuste)</span>
+<span id="cb37-6"><a href="#cb37-6"></a><span class="co"># DFBETAs</span></span>
+<span id="cb37-7"><a href="#cb37-7"></a><span class="kw">ols_plot_dfbetas</span>(ajuste)</span>
+<span id="cb37-8"><a href="#cb37-8"></a><span class="co"># Residuos estudentizados</span></span>
+<span id="cb37-9"><a href="#cb37-9"></a><span class="kw">ols_plot_resid_stud</span>(ajuste)</span></code></pre></div>
 </div>
 </div>
 <div id="predicciones-1" class="section level2">
 <h2>Predicciones</h2>
+<div id="intervalos-de-confianza-al-90-para-mathbbeyxx_i" class="section level3">
+<h3>Intervalos de confianza al 90% para <span class="math inline">\(\mathbb{E}(Y|X=x_i)\)</span>:</h3>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1"></a>banda.conf<span class="fl">.90</span> &lt;-<span class="st"> </span><span class="kw">predict</span>(ajuste, <span class="dt">se.fit =</span> <span class="ot">TRUE</span>,</span>
+<span id="cb38-2"><a href="#cb38-2"></a>                         <span class="dt">interval =</span> <span class="st">&quot;confidence&quot;</span>, <span class="dt">level =</span> <span class="fl">0.90</span>)</span></code></pre></div>
+</div>
+<div id="intervalos-de-predicción-al-90-para-yxx_i" class="section level3">
+<h3>Intervalos de predicción al 90% para <span class="math inline">\(Y|X=x_i\)</span>:</h3>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1"></a>banda.pred<span class="fl">.90</span> &lt;-<span class="st"> </span><span class="kw">predict</span>(ajuste, <span class="dt">se.fit =</span> <span class="ot">TRUE</span>, </span>
+<span id="cb39-2"><a href="#cb39-2"></a>                         <span class="dt">interval =</span> <span class="st">&quot;prediction&quot;</span>, <span class="dt">level =</span> <span class="fl">0.90</span>)</span></code></pre></div>
+</div>
+<div id="intervalos-de-confianzapredicción-al-90-para-nuevas-observaciones" class="section level3">
+<h3>Intervalos de confianza/predicción al 90% para nuevas observaciones</h3>
+<p>En este ejemplo para un modelo con dos explicativas: <code>explicativa1</code> y <code>explicativa2</code>.</p>
+<p>Es necesario introducir un dataframe con las nuevas observaciones que tenga por columnas los mismos nombres de las explicativas del modelo.</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1"></a>new.data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">explicativa1 =</span> valores.predecir1,</span>
+<span id="cb40-2"><a href="#cb40-2"></a>                       <span class="dt">explicativa2 =</span> valores.predecir2)</span>
+<span id="cb40-3"><a href="#cb40-3"></a>IC<span class="fl">.90</span> &lt;-<span class="st"> </span><span class="kw">predict</span>(ajuste, <span class="dt">newdata =</span> new.data,</span>
+<span id="cb40-4"><a href="#cb40-4"></a>                         <span class="dt">interval =</span> <span class="st">&quot;confidence&quot;</span>, <span class="dt">level =</span> <span class="fl">0.90</span>, <span class="dt">se.fit =</span> <span class="ot">TRUE</span>)</span></code></pre></div>
+<hr />
+<p><strong>Ejemplo</strong></p>
+<p>Estimar la evolución de la media de la variable endógena en función de una variable explicativa (manteniendo constante el valor de las demás en, por ejemplo, su valor medio).</p>
+<p>En este caso para la variable <code>explicativa1</code> manteniendo constante el valor de <code>explicativa2</code> y <code>explicativa3</code> en sus medias</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1"></a>EX1 &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="kw">min</span>(datos<span class="op">$</span>explicativa1), <span class="kw">max</span>(datos<span class="op">$</span>explicativa1), <span class="dt">length=</span><span class="dv">50</span>)</span>
+<span id="cb41-2"><a href="#cb41-2"></a>new &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">explicativa2=</span><span class="kw">mean</span>(datos<span class="op">$</span>explicativa2), </span>
+<span id="cb41-3"><a href="#cb41-3"></a>                  <span class="dt">explicativa3=</span><span class="kw">mean</span>(datos<span class="op">$</span>explicativa3), <span class="dt">explicativa1=</span>EX1)</span>
+<span id="cb41-4"><a href="#cb41-4"></a>calidad.est.segun.explicativa1 &lt;-<span class="st"> </span><span class="kw">predict</span>(ajuste1, new, </span>
+<span id="cb41-5"><a href="#cb41-5"></a>                                     <span class="dt">interval=</span><span class="st">&quot;confidence&quot;</span>)</span>
+<span id="cb41-6"><a href="#cb41-6"></a>calidad.pred.segun.explicativa1 &lt;-<span class="st"> </span><span class="kw">predict</span>(ajuste1, new, </span>
+<span id="cb41-7"><a href="#cb41-7"></a>                                     <span class="dt">interval=</span><span class="st">&quot;prediction&quot;</span>)</span>
+<span id="cb41-8"><a href="#cb41-8"></a><span class="kw">plot</span>(EX1, calidad.est.segun.explicativa1[,<span class="dv">1</span>], <span class="dt">type=</span><span class="st">&quot;l&quot;</span>, <span class="dt">xlab=</span><span class="st">&quot;Explicativa 1&quot;</span>,</span>
+<span id="cb41-9"><a href="#cb41-9"></a>     <span class="dt">ylab=</span><span class="st">&quot;Variable endógena&quot;, main=&quot;&quot;, lwd=1, col=&quot;</span>blue<span class="st">&quot;,</span></span>
+<span id="cb41-10"><a href="#cb41-10"></a><span class="st">     ylim=range(datos$var.endogena))</span></span>
+<span id="cb41-11"><a href="#cb41-11"></a><span class="st">matlines(AL2, calidad.est.segun.explicativa1[,-1], lty=2, col=2, lwd=2)</span></span>
+<span id="cb41-12"><a href="#cb41-12"></a><span class="st">matlines(AL2, calidad.pred.segun.explicativa1[,-1], lty=2, col=3, lwd=2)</span></span></code></pre></div>
+</div>
 </div>
 <div id="criterios-para-la-detección-de-multicolinealidad" class="section level2">
 <h2>Criterios para la detección de multicolinealidad</h2>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a>correlaciones &lt;-<span class="st"> </span><span class="kw">cor</span>(conjunto.datos)</span>
-<span id="cb34-2"><a href="#cb34-2"></a></span>
-<span id="cb34-3"><a href="#cb34-3"></a><span class="kw">det</span>(correlaciones) <span class="co"># Si es muy cercano a cero hay alta multicolinealidad.</span></span></code></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1"></a>correlaciones &lt;-<span class="st"> </span><span class="kw">cor</span>(conjunto.datos)</span>
+<span id="cb42-2"><a href="#cb42-2"></a></span>
+<span id="cb42-3"><a href="#cb42-3"></a><span class="kw">det</span>(correlaciones) <span class="co"># Si es muy cercano a cero hay alta multicolinealidad.</span></span></code></pre></div>
 <div id="factores-de-inflación-de-la-varianza" class="section level3">
 <h3>Factores de Inflación de la Varianza</h3>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a>FIV &lt;-<span class="st"> </span>faraway<span class="op">::</span><span class="kw">vif</span>(ajuste)</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1"></a>FIV &lt;-<span class="st"> </span>faraway<span class="op">::</span><span class="kw">vif</span>(ajuste)</span></code></pre></div>
 <p>Como criterio <span class="math inline">\(\mathrm{FIV}_i &gt; 10 \Longrightarrow\)</span> Alta multicolinealidad.</p>
 <p>Compararemos los FIV con <span class="math inline">\(\dfrac{1}{1-R^2}\)</span></p>
-<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1"></a>umbral &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span><span class="op">-</span><span class="kw">summary</span>(ajuste)<span class="op">$</span>r.squared)</span>
-<span id="cb36-2"><a href="#cb36-2"></a><span class="kw">print</span>(FIV[FIV<span class="op">&gt;</span>umbral])</span></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1"></a>umbral &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">/</span>(<span class="dv">1</span><span class="op">-</span><span class="kw">summary</span>(ajuste)<span class="op">$</span>r.squared)</span>
+<span id="cb44-2"><a href="#cb44-2"></a><span class="kw">print</span>(FIV[FIV<span class="op">&gt;</span>umbral])</span></code></pre></div>
 </div>
 <div id="índice-de-condicionamiento" class="section level3">
 <h3>Índice de Condicionamiento</h3>
@@ -659,8 +718,8 @@ H_1&amp;:&amp; \sigma^2 \neq cte
 <div id="componentes-principales" class="section level3">
 <h3>Componentes principales</h3>
 <p>Comprobar si unas pocas componentes principales explican una gran cantidad de varianza.</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a>pca &lt;-<span class="st"> </span><span class="kw">prcomp</span>(conjunto.datos, <span class="dt">scale=</span>T)</span>
-<span id="cb37-2"><a href="#cb37-2"></a><span class="kw">summary</span>(pca)</span></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1"></a>pca &lt;-<span class="st"> </span><span class="kw">prcomp</span>(conjunto.datos, <span class="dt">scale=</span>T)</span>
+<span id="cb45-2"><a href="#cb45-2"></a><span class="kw">summary</span>(pca)</span></code></pre></div>
 </div>
 <div id="análisis-de-multicolinealidad-completo" class="section level3">
 <h3>Análisis de multicolinealidad completo</h3>
@@ -690,22 +749,22 @@ H_1&amp;:&amp; \sigma^2 \neq cte
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1"></a>mctest<span class="op">::</span><span class="kw">mctest</span>(ajuste, <span class="dt">type=</span><span class="st">&quot;o&quot;</span>)</span>
-<span id="cb38-2"><a href="#cb38-2"></a>mctest<span class="op">::</span><span class="kw">mctest</span>(ajuste, <span class="dt">type=</span><span class="st">&quot;i&quot;</span>, <span class="dt">corr=</span>T) </span>
-<span id="cb38-3"><a href="#cb38-3"></a>mctest<span class="op">::</span><span class="kw">mctest</span>(ajuste, <span class="dt">type=</span><span class="st">&quot;i&quot;</span>, <span class="dt">method =</span> <span class="st">&quot;VIF&quot;</span>) </span>
-<span id="cb38-4"><a href="#cb38-4"></a>mctest<span class="op">::</span><span class="kw">mctest</span>(ajuste, <span class="dt">type=</span><span class="st">&quot;i&quot;</span>, <span class="dt">method =</span> <span class="st">&quot;TOL&quot;</span>) </span></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1"></a>mctest<span class="op">::</span><span class="kw">mctest</span>(ajuste, <span class="dt">type=</span><span class="st">&quot;o&quot;</span>)</span>
+<span id="cb46-2"><a href="#cb46-2"></a>mctest<span class="op">::</span><span class="kw">mctest</span>(ajuste, <span class="dt">type=</span><span class="st">&quot;i&quot;</span>, <span class="dt">corr=</span>T) </span>
+<span id="cb46-3"><a href="#cb46-3"></a>mctest<span class="op">::</span><span class="kw">mctest</span>(ajuste, <span class="dt">type=</span><span class="st">&quot;i&quot;</span>, <span class="dt">method =</span> <span class="st">&quot;VIF&quot;</span>) </span>
+<span id="cb46-4"><a href="#cb46-4"></a>mctest<span class="op">::</span><span class="kw">mctest</span>(ajuste, <span class="dt">type=</span><span class="st">&quot;i&quot;</span>, <span class="dt">method =</span> <span class="st">&quot;TOL&quot;</span>) </span></code></pre></div>
 </div>
 </div>
 <div id="criterios-para-selección-de-modelos" class="section level2">
 <h2>Criterios para selección de modelos</h2>
 <div id="criterio-mssr-anova-para-modelos-anidados" class="section level3">
 <h3>Criterio MSS(R): ANOVA para modelos anidados</h3>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1"></a>modelo.completo &lt;-<span class="st"> </span><span class="kw">lm</span>(variable.endogena<span class="op">~</span>., <span class="dt">data=</span>conjunto.datos)</span>
-<span id="cb39-2"><a href="#cb39-2"></a></span>
-<span id="cb39-3"><a href="#cb39-3"></a><span class="co"># Modelo con menos variables</span></span>
-<span id="cb39-4"><a href="#cb39-4"></a>modelo.anidado &lt;-<span class="st"> </span><span class="kw">lm</span>(variable.endogena<span class="op">~</span>explicativa1<span class="op">+</span>explicativa2)</span>
-<span id="cb39-5"><a href="#cb39-5"></a></span>
-<span id="cb39-6"><a href="#cb39-6"></a><span class="kw">anova</span>(modelo.anidado, modelo.completo)</span></code></pre></div>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1"></a>modelo.completo &lt;-<span class="st"> </span><span class="kw">lm</span>(variable.endogena<span class="op">~</span>., <span class="dt">data=</span>conjunto.datos)</span>
+<span id="cb47-2"><a href="#cb47-2"></a></span>
+<span id="cb47-3"><a href="#cb47-3"></a><span class="co"># Modelo con menos variables</span></span>
+<span id="cb47-4"><a href="#cb47-4"></a>modelo.anidado &lt;-<span class="st"> </span><span class="kw">lm</span>(variable.endogena<span class="op">~</span>explicativa1<span class="op">+</span>explicativa2)</span>
+<span id="cb47-5"><a href="#cb47-5"></a></span>
+<span id="cb47-6"><a href="#cb47-6"></a><span class="kw">anova</span>(modelo.anidado, modelo.completo)</span></code></pre></div>
 </div>
 <div id="criterio-c_p-de-mallows" class="section level3">
 <h3>Criterio <span class="math inline">\(C_p\)</span> de Mallows</h3>
@@ -728,24 +787,24 @@ H_1&amp;:&amp; \sigma^2 \neq cte
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1"></a>Cp.residuos &lt;-<span class="st"> </span>leaps<span class="op">::</span><span class="kw">leaps</span>(<span class="dt">x=</span>conjunto.datos[, <span class="dv">2</span><span class="op">:</span><span class="dv">4</span>],</span>
-<span id="cb40-2"><a href="#cb40-2"></a>                     <span class="dt">y=</span>conjunto.datos[, <span class="dv">1</span>], <span class="dt">method=</span><span class="st">&quot;Cp&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1"></a>Cp.residuos &lt;-<span class="st"> </span>leaps<span class="op">::</span><span class="kw">leaps</span>(<span class="dt">x=</span>conjunto.datos[, <span class="dv">2</span><span class="op">:</span><span class="dv">4</span>],</span>
+<span id="cb48-2"><a href="#cb48-2"></a>                     <span class="dt">y=</span>conjunto.datos[, <span class="dv">1</span>], <span class="dt">method=</span><span class="st">&quot;Cp&quot;</span>)</span></code></pre></div>
 <p>Una forma de ver los <span class="math inline">\(C_p\)</span> de Mallows como tabla, incluyendo columnas que indican si la variable está presente en el modelo (1) o no (0) y el número total de parámetros en el modelo es:</p>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1"></a><span class="kw">cbind</span>(Cp.residuos<span class="op">$</span>which, <span class="dt">p=</span>Cp.residuos<span class="op">$</span>size, <span class="dt">Cp=</span>Cp.residuos<span class="op">$</span>Cp)</span></code></pre></div>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1"></a><span class="kw">cbind</span>(Cp.residuos<span class="op">$</span>which, <span class="dt">p=</span>Cp.residuos<span class="op">$</span>size, <span class="dt">Cp=</span>Cp.residuos<span class="op">$</span>Cp)</span></code></pre></div>
 </div>
 <div id="criterio-de-información-de-akaike" class="section level3">
 <h3>Criterio de información de Akaike</h3>
 <p>Calcula la verosimilitud del modelo penalizando por el número de variables.</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1"></a><span class="kw">AIC</span>(ajuste)    <span class="co"># cuanto más pequeño, mejor (más ajustado)</span></span></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1"></a><span class="kw">AIC</span>(ajuste)    <span class="co"># cuanto más pequeño, mejor (más ajustado)</span></span></code></pre></div>
 </div>
 <div id="criterio-de-información-bayesiano-schwarz" class="section level3">
 <h3>Criterio de Información Bayesiano (Schwarz)</h3>
 <p>A diferencia del de Akaike tiene en cuenta el número de datos que tenemos en la muestra.</p>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1"></a><span class="kw">BIC</span>(ajuste)    <span class="co"># cuanto más pequeño, mejor (más ajustado)</span></span></code></pre></div>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1"></a><span class="kw">BIC</span>(ajuste)    <span class="co"># cuanto más pequeño, mejor (más ajustado)</span></span></code></pre></div>
 </div>
 <div id="estadístico-press" class="section level3">
 <h3>Estadístico PRESS</h3>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1"></a>DAAG<span class="op">::</span><span class="kw">press</span>(ajuste)   <span class="co"># cuanto más pequeño, mejor (más ajustado)</span></span></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1"></a>DAAG<span class="op">::</span><span class="kw">press</span>(ajuste)   <span class="co"># cuanto más pequeño, mejor (más ajustado)</span></span></code></pre></div>
 </div>
 </div>
 <div id="selección-de-variables" class="section level2">
@@ -754,7 +813,7 @@ H_1&amp;:&amp; \sigma^2 \neq cte
 <div id="comparar-el-modelo-al-eliminar-una-explicativa" class="section level3">
 <h3>Comparar el modelo al eliminar una explicativa</h3>
 <p>El parámetro <code>test=&quot;F&quot;</code> nos devuelve el valor del estadístico <span class="math inline">\(F\)</span></p>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1"></a><span class="kw">drop1</span>(ajuste, <span class="dt">test=</span><span class="st">&quot;F&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1"></a><span class="kw">drop1</span>(ajuste, <span class="dt">test=</span><span class="st">&quot;F&quot;</span>)</span></code></pre></div>
 </div>
 <div id="comparar-el-modelo-al-añadir-una-explicativa" class="section level3">
 <h3>Comparar el modelo al añadir una explicativa</h3>
@@ -762,19 +821,19 @@ H_1&amp;:&amp; \sigma^2 \neq cte
 <li><p>En <code>scope</code> añadimos como rango inferior <code>~.</code> (el ajuste que ya tenemos) Y las variables que queramos considerar añadir con +</p></li>
 <li><p>El parámetro <code>test=&quot;F&quot;</code> nos devuelve el valor del estadístico <span class="math inline">\(F\)</span></p></li>
 </ul>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1"></a><span class="kw">add1</span>(ajuste, <span class="dt">scope=</span> <span class="op">~</span>.<span class="op">+</span>explicativa<span class="fl">.2</span><span class="op">+</span>explicativa<span class="fl">.3</span>, <span class="dt">test=</span><span class="st">&quot;F&quot;</span>,</span>
-<span id="cb46-2"><a href="#cb46-2"></a>     <span class="dt">data=</span>conjunto.datos)</span></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1"></a><span class="kw">add1</span>(ajuste, <span class="dt">scope=</span> <span class="op">~</span>.<span class="op">+</span>explicativa<span class="fl">.2</span><span class="op">+</span>explicativa<span class="fl">.3</span>, <span class="dt">test=</span><span class="st">&quot;F&quot;</span>,</span>
+<span id="cb54-2"><a href="#cb54-2"></a>     <span class="dt">data=</span>conjunto.datos)</span></code></pre></div>
 <p>También podemos considerar añadir <strong>cualquier variable del conjunto de datos</strong> usando el modelo completo.</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1"></a>modelo.completo &lt;-<span class="st"> </span><span class="kw">lm</span>(var.endogena<span class="op">~</span>., <span class="dt">data=</span>conjunto.datos)</span>
-<span id="cb47-2"><a href="#cb47-2"></a><span class="kw">add1</span>(ajuste, <span class="dt">scope=</span>modelo.completo, <span class="dt">test=</span><span class="st">&quot;F&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1"></a>modelo.completo &lt;-<span class="st"> </span><span class="kw">lm</span>(var.endogena<span class="op">~</span>., <span class="dt">data=</span>conjunto.datos)</span>
+<span id="cb55-2"><a href="#cb55-2"></a><span class="kw">add1</span>(ajuste, <span class="dt">scope=</span>modelo.completo, <span class="dt">test=</span><span class="st">&quot;F&quot;</span>)</span></code></pre></div>
 </div>
 <div id="selección-sistemática-de-un-subconjunto-de-variables" class="section level3">
 <h3>Selección sistemática de un subconjunto de variables</h3>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1"></a><span class="co"># Modelo que contiene solo el intercept</span></span>
-<span id="cb48-2"><a href="#cb48-2"></a>modelo.intercept &lt;-<span class="st"> </span><span class="kw">lm</span>(var.endogena<span class="op">~</span><span class="dv">1</span>, <span class="dt">data=</span>conjunto.datos)</span>
-<span id="cb48-3"><a href="#cb48-3"></a></span>
-<span id="cb48-4"><a href="#cb48-4"></a><span class="co"># Modelo completo con todas las regresoras</span></span>
-<span id="cb48-5"><a href="#cb48-5"></a>modelo.completo &lt;-<span class="st"> </span><span class="kw">lm</span>(var.endogena<span class="op">~</span>., <span class="dt">data=</span>conjunto.datos)</span></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1"></a><span class="co"># Modelo que contiene solo el intercept</span></span>
+<span id="cb56-2"><a href="#cb56-2"></a>modelo.intercept &lt;-<span class="st"> </span><span class="kw">lm</span>(var.endogena<span class="op">~</span><span class="dv">1</span>, <span class="dt">data=</span>conjunto.datos)</span>
+<span id="cb56-3"><a href="#cb56-3"></a></span>
+<span id="cb56-4"><a href="#cb56-4"></a><span class="co"># Modelo completo con todas las regresoras</span></span>
+<span id="cb56-5"><a href="#cb56-5"></a>modelo.completo &lt;-<span class="st"> </span><span class="kw">lm</span>(var.endogena<span class="op">~</span>., <span class="dt">data=</span>conjunto.datos)</span></code></pre></div>
 <table>
 <colgroup>
 <col width="23%"></col>
@@ -809,25 +868,25 @@ H_1&amp;:&amp; \sigma^2 \neq cte
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1"></a>step.modelo &lt;-<span class="st"> </span><span class="kw">step</span>(modelo.intercept,</span>
-<span id="cb49-2"><a href="#cb49-2"></a>                    <span class="dt">scope=</span><span class="kw">list</span>(<span class="dt">lower=</span>modelo.intercept, <span class="dt">upper=</span>modelo.completo),</span>
-<span id="cb49-3"><a href="#cb49-3"></a>                    <span class="dt">direction=</span><span class="st">&quot;both&quot;</span>, <span class="dt">trace=</span><span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1"></a>step.modelo &lt;-<span class="st"> </span><span class="kw">step</span>(modelo.intercept,</span>
+<span id="cb57-2"><a href="#cb57-2"></a>                    <span class="dt">scope=</span><span class="kw">list</span>(<span class="dt">lower=</span>modelo.intercept, <span class="dt">upper=</span>modelo.completo),</span>
+<span id="cb57-3"><a href="#cb57-3"></a>                    <span class="dt">direction=</span><span class="st">&quot;both&quot;</span>, <span class="dt">trace=</span><span class="dv">1</span>)</span></code></pre></div>
 <p>Si no se especifica el parámetro <strong>scope</strong> se utiliza todo el rango de modelos pero la dirección utilizada será <code>&quot;backward&quot;</code></p>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1"></a><span class="kw">step</span>(modelo.completo)</span></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1"></a><span class="kw">step</span>(modelo.completo)</span></code></pre></div>
 <p><strong>Resumen del proceso</strong></p>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1"></a>step.modelo<span class="op">$</span>anova</span></code></pre></div>
+<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1"></a>step.modelo<span class="op">$</span>anova</span></code></pre></div>
 <p><strong>Grados de libertad de la parte explicada por el modelo y AIC</strong></p>
-<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1"></a><span class="kw">extractAIC</span>(step.modelo)</span></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1"></a><span class="kw">extractAIC</span>(step.modelo)</span></code></pre></div>
 </div>
 <div id="eliminación-progresiva-de-variables" class="section level3">
 <h3>Eliminación progresiva de variables</h3>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1"></a>step.backward &lt;-<span class="st"> </span><span class="kw">step</span>(modelo.completo, <span class="dt">direction=</span><span class="st">&quot;backward&quot;</span>, <span class="dt">trace=</span><span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1"></a>step.backward &lt;-<span class="st"> </span><span class="kw">step</span>(modelo.completo, <span class="dt">direction=</span><span class="st">&quot;backward&quot;</span>, <span class="dt">trace=</span><span class="dv">1</span>)</span></code></pre></div>
 </div>
 <div id="introducción-progresiva-de-variables" class="section level3">
 <h3>Introducción progresiva de variables</h3>
-<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1"></a>step.forward &lt;-<span class="st"> </span><span class="kw">step</span>(modelo.intercept,</span>
-<span id="cb54-2"><a href="#cb54-2"></a>                     <span class="dt">scope=</span><span class="kw">list</span>(<span class="dt">lower=</span>modelo.intercept, <span class="dt">upper=</span>modelo.completo),</span>
-<span id="cb54-3"><a href="#cb54-3"></a>                     <span class="dt">direction=</span><span class="st">&quot;forward&quot;</span>, <span class="dt">trace=</span><span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1"></a>step.forward &lt;-<span class="st"> </span><span class="kw">step</span>(modelo.intercept,</span>
+<span id="cb62-2"><a href="#cb62-2"></a>                     <span class="dt">scope=</span><span class="kw">list</span>(<span class="dt">lower=</span>modelo.intercept, <span class="dt">upper=</span>modelo.completo),</span>
+<span id="cb62-3"><a href="#cb62-3"></a>                     <span class="dt">direction=</span><span class="st">&quot;forward&quot;</span>, <span class="dt">trace=</span><span class="dv">1</span>)</span></code></pre></div>
 </div>
 <div id="búsqueda-exhaustiva-con-la-librería-leaps" class="section level3">
 <h3>Búsqueda exhaustiva con la librería leaps</h3>
@@ -853,10 +912,10 @@ H_1&amp;:&amp; \sigma^2 \neq cte
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1"></a>modelo.exhaustivo &lt;-<span class="st"> </span>leaps<span class="op">::</span><span class="kw">regsubsets</span>(var.endogena <span class="op">~</span>.,</span>
-<span id="cb55-2"><a href="#cb55-2"></a>                                       <span class="dt">data=</span>conjunto.datos, <span class="dt">nbest=</span><span class="dv">1</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1"></a>modelo.exhaustivo &lt;-<span class="st"> </span>leaps<span class="op">::</span><span class="kw">regsubsets</span>(var.endogena <span class="op">~</span>.,</span>
+<span id="cb63-2"><a href="#cb63-2"></a>                                       <span class="dt">data=</span>conjunto.datos, <span class="dt">nbest=</span><span class="dv">1</span>)</span></code></pre></div>
 <p>Para ver los resultados, emplear <code>summary()</code></p>
-<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1"></a><span class="kw">summary</span>(modelo.exhaustivo)</span></code></pre></div>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1"></a><span class="kw">summary</span>(modelo.exhaustivo)</span></code></pre></div>
 <p>Además summary() tiene los siguientes atributos:</p>
 <table>
 <thead>
@@ -888,30 +947,61 @@ H_1&amp;:&amp; \sigma^2 \neq cte
 </tr>
 </tbody>
 </table>
-<p>Viendo los datos en una salida:</p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1"></a>S &lt;-<span class="st"> </span><span class="kw">summary</span>(modelo.exhaustivo)</span>
-<span id="cb57-2"><a href="#cb57-2"></a></span>
-<span id="cb57-3"><a href="#cb57-3"></a><span class="kw">cbind</span>(S<span class="op">$</span>which, <span class="kw">round</span>(<span class="kw">cbind</span>(<span class="dt">rsq=</span>S<span class="op">$</span>rsq, <span class="dt">adjr2=</span>S<span class="op">$</span>adjr2, <span class="dt">cp=</span>S<span class="op">$</span>cp, <span class="dt">bic=</span>S<span class="op">$</span>bic, </span>
-<span id="cb57-4"><a href="#cb57-4"></a>                           <span class="dt">rss=</span>S<span class="op">$</span>rss), <span class="dv">3</span>))</span></code></pre></div>
+<p>Viendo todos en una única salida:</p>
+<div class="sourceCode" id="cb65"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1"></a>S &lt;-<span class="st"> </span><span class="kw">summary</span>(modelo.exhaustivo)</span>
+<span id="cb65-2"><a href="#cb65-2"></a></span>
+<span id="cb65-3"><a href="#cb65-3"></a><span class="kw">cbind</span>(S<span class="op">$</span>which, <span class="kw">round</span>(<span class="kw">cbind</span>(<span class="dt">rsq=</span>S<span class="op">$</span>rsq, <span class="dt">adjr2=</span>S<span class="op">$</span>adjr2, <span class="dt">cp=</span>S<span class="op">$</span>cp, <span class="dt">bic=</span>S<span class="op">$</span>bic, </span>
+<span id="cb65-4"><a href="#cb65-4"></a>                           <span class="dt">rss=</span>S<span class="op">$</span>rss), <span class="dv">3</span>))</span></code></pre></div>
 <p>Leaps incluye también plots</p>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1"></a><span class="kw">plot</span>(modelo.exhaustivo, <span class="dt">scale=</span><span class="st">&quot;adjr2&quot;</span>)</span>
-<span id="cb58-2"><a href="#cb58-2"></a><span class="kw">plot</span>(modelo.exhaustivo, <span class="dt">scale=</span><span class="st">&quot;bic&quot;</span>)</span>
-<span id="cb58-3"><a href="#cb58-3"></a><span class="kw">plot</span>(modelo.exhaustivo, <span class="dt">scale=</span><span class="st">&quot;Cp&quot;</span>)</span>
-<span id="cb58-4"><a href="#cb58-4"></a><span class="kw">plot</span>(modelo.exhaustivo, <span class="dt">scale=</span><span class="st">&quot;r2&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1"></a><span class="kw">plot</span>(modelo.exhaustivo, <span class="dt">scale=</span><span class="st">&quot;adjr2&quot;</span>)</span>
+<span id="cb66-2"><a href="#cb66-2"></a><span class="kw">plot</span>(modelo.exhaustivo, <span class="dt">scale=</span><span class="st">&quot;bic&quot;</span>)</span>
+<span id="cb66-3"><a href="#cb66-3"></a><span class="kw">plot</span>(modelo.exhaustivo, <span class="dt">scale=</span><span class="st">&quot;Cp&quot;</span>)</span>
+<span id="cb66-4"><a href="#cb66-4"></a><span class="kw">plot</span>(modelo.exhaustivo, <span class="dt">scale=</span><span class="st">&quot;r2&quot;</span>)</span></code></pre></div>
 <p>Nótese que el atributo de <code>summary</code> para el <span class="math inline">\(C_p\)</span> de Mallows tiene c minúscula y el del plot del modelo mayúscula</p>
 </div>
-<div id="vías-de-evaluación" class="section level3">
-<h3>Vías de evaluación</h3>
+</div>
+<div id="vías-de-evaluación" class="section level2">
+<h2>Vías de evaluación</h2>
+<div id="contraste-de-validación" class="section level3">
+<h3>Contraste de validación</h3>
+<p>Partimos al azar el conjunto de datos en dos submuestras de tamaño similar</p>
+<div class="sourceCode" id="cb67"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1"></a>n &lt;-<span class="st"> </span><span class="kw">nrow</span>(datos)</span>
+<span id="cb67-2"><a href="#cb67-2"></a>n.entrenar &lt;-<span class="st"> </span><span class="kw">round</span>(n<span class="op">/</span><span class="dv">2</span>)</span>
+<span id="cb67-3"><a href="#cb67-3"></a>n.test &lt;-<span class="st"> </span>n <span class="op">-</span><span class="st"> </span>n.entrenar</span></code></pre></div>
+<p>Muestreamos los índices a ajustar</p>
+<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1"></a>filas.entrenar &lt;-<span class="st"> </span><span class="kw">sample</span>(<span class="dv">1</span><span class="op">:</span>n, n.entrenar)</span>
+<span id="cb68-2"><a href="#cb68-2"></a>datos.entrenar &lt;-<span class="st"> </span>datos[filas.entrenar,]</span>
+<span id="cb68-3"><a href="#cb68-3"></a>datos.test &lt;-<span class="st"> </span>datos[<span class="op">-</span>filas.entrenar,]</span></code></pre></div>
+<p>Modelo complejo</p>
+<div class="sourceCode" id="cb69"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1"></a>fit.MC.entrenar &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">formula</span>(ajuste), <span class="dt">data=</span>datos.entrenar)</span>
+<span id="cb69-2"><a href="#cb69-2"></a>fit.MC.test &lt;-<span class="st"> </span><span class="kw">lm</span>(<span class="kw">formula</span>(ajuste), <span class="dt">data=</span>datos.test)</span></code></pre></div>
+<p>Modelo sencillo</p>
+<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1"></a>fit.MS &lt;-<span class="st"> </span>ajuste</span></code></pre></div>
+<p>Nos quedamos con los <span class="math inline">\(\mathrm{SS(R)}\)</span> de cada uno de los ajustes:</p>
+<div class="sourceCode" id="cb71"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1"></a>p &lt;-<span class="st"> </span><span class="kw">length</span>(<span class="kw">coef</span>(ajuste)) <span class="co"># Número de coeficientes de los modelos</span></span>
+<span id="cb71-2"><a href="#cb71-2"></a>SSR.entrenar &lt;-<span class="st"> </span><span class="kw">anova</span>(fit.MC.entrenar)[p, <span class="dv">2</span>]</span>
+<span id="cb71-3"><a href="#cb71-3"></a>SSR.test &lt;-<span class="st"> </span><span class="kw">anova</span>(fit.MC.test)[p, <span class="dv">2</span>]</span>
+<span id="cb71-4"><a href="#cb71-4"></a>SSR &lt;-<span class="st"> </span><span class="kw">anova</span>(fit.MS)[p, <span class="dv">2</span>]</span></code></pre></div>
+<p>Cálculo del estadístico <span class="math inline">\(\hat{F}\)</span>:</p>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1"></a>hat.F &lt;-<span class="st"> </span>((SSR <span class="op">-</span><span class="st"> </span>SSR.entrenar <span class="op">-</span><span class="st"> </span>SSR.test)<span class="op">/</span>p) <span class="op">/</span><span class="st"> </span>((SSR.entrenar <span class="op">+</span><span class="st"> </span>SSR.test)<span class="op">/</span>(n<span class="dv">-2</span><span class="op">*</span>p))</span></code></pre></div>
+<p>Cálculo del p-valor:</p>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1"></a><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">pf</span>(hat.F, p, n <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>p)</span></code></pre></div>
+<p>Si el contraste no resulta significativo no rechazamos el modelo sencillo y es indicativo de que el ajuste se comporta bien al predecir nuevas observaciones.</p>
 </div>
 <div id="coeficiente-de-robustez" class="section level3">
 <h3>Coeficiente de robustez</h3>
 <p><span class="math display">\[
 B^2 = \dfrac{\mathrm{SS(R)}}{\mathrm{PRESS}} \qquad \qquad B^2 \in (0,1)
 \]</span></p>
-<div class="sourceCode" id="cb59"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1"></a>B2 &lt;-<span class="st"> </span><span class="kw">sum</span>(<span class="kw">residuals</span>(ajuste)<span class="op">^</span><span class="dv">2</span><span class="op">/</span>DAAG<span class="op">::</span><span class="kw">press</span>(ajuste))</span></code></pre></div>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1"></a>B2 &lt;-<span class="st"> </span><span class="kw">sum</span>(<span class="kw">residuals</span>(ajuste)<span class="op">^</span><span class="dv">2</span><span class="op">/</span>DAAG<span class="op">::</span><span class="kw">press</span>(ajuste))</span></code></pre></div>
 </div>
 <div id="validación-cruzada" class="section level3">
 <h3>Validación Cruzada</h3>
+<div class="sourceCode" id="cb75"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1"></a>cv.fit &lt;-<span class="st"> </span>DAAG<span class="op">::</span><span class="kw">cv.lm</span>(<span class="dt">data=</span>datos, <span class="dt">form.lm=</span><span class="kw">formula</span>(ajuste), <span class="dt">m=</span><span class="dv">5</span>)</span>
+<span id="cb75-2"><a href="#cb75-2"></a><span class="co"># m es el número de grupos en los que se dividirá el conjunto de datos</span></span></code></pre></div>
+<p>Calculamos la desviación de las predicciones respecto a los valores originales en términos de la raíz cuadrada de la media de los cuadrados de las diferencias</p>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1"></a>errores.fit &lt;-<span class="st"> </span>cv.fit<span class="op">$</span>cvpred <span class="op">-</span><span class="st"> </span>cv.fit<span class="op">$</span>explicativa1</span>
+<span id="cb76-2"><a href="#cb76-2"></a>RMSD.fit &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">mean</span>(errores.fit<span class="op">^</span><span class="dv">2</span>))</span></code></pre></div>
 </div>
 </div>
 </div>
